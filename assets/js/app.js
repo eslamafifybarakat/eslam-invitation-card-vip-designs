@@ -126,7 +126,7 @@ function textsStatus(){$('textsStatus').textContent=S.edited?t('textsEdited'):S.
 function applyLang(){
   const ar=S.lang==='ar';document.documentElement.lang=S.lang;document.documentElement.dir=ar?'rtl':'ltr';
   document.title=t('docTitle');const lb=$('langBtn');lb.textContent=ar?'EN':'ع';lb.setAttribute('aria-label',ar?'EN — English':'ع — العربية');lb.lang=ar?'en':'ar';
-  document.querySelectorAll('[data-i18n]').forEach(e=>e.textContent=t(e.dataset.i18n));
+  document.querySelectorAll('[data-i18n]').forEach(e=>{const v=t(e.dataset.i18n);if(e.textContent!==v)e.textContent=v});
   document.querySelectorAll('[data-i18n-ph]').forEach(e=>e.placeholder=t(e.dataset.i18nPh));
   document.querySelectorAll('[data-i18n-aria]').forEach(e=>e.setAttribute('aria-label',t(e.dataset.i18nAria)));
   buildHonors();buildSizes();buildEditorLabels();buildShareGrids();textsStatus();updateNow();
@@ -281,16 +281,18 @@ function setAR(){const {w,h}=curSize();document.documentElement.style.setPropert
 function resizeCanvases(force){
   setAR();const p=previewDims();
   if(!force&&Math.abs(p.w-pvW)<8&&Math.abs(p.h-pvH)<8)return;
-  pvW=p.w;pvH=p.h;Object.keys(canvases).forEach(id=>{const c=canvases[id];c.width=p.w;c.height=p.h});renderAll();
+  pvW=p.w;pvH=p.h;Object.keys(canvases).forEach(id=>placeholder(canvases[id]));renderAll();
 }
+/* الكانفاس بيبدأ صغير بنفس النسبة (ذاكرة أقل بكتير) وبياخد حجمه الحقيقي لحظة الرسم بس */
+function placeholder(c){const k=Math.max(pvW,pvH)/64;c.width=Math.max(1,Math.round(pvW/k));c.height=Math.max(1,Math.round(pvH/k))}
 function buildSlider(){
   list=DESIGNS.filter(d=>S.filter==='all'||d.pos===S.filter);
   const track=$('track');track.innerHTML='';slides=[];
   setAR();const p=previewDims();pvW=p.w;pvH=p.h;
   const frag=document.createDocumentFragment();
   list.forEach((d,i)=>{
-    let c=canvases[d.id];if(!c){c=document.createElement('canvas');canvases[d.id]=c;c.width=p.w;c.height=p.h}
-    else if(c.width!==p.w||c.height!==p.h){c.width=p.w;c.height=p.h;dirty[d.id]=1}
+    let c=canvases[d.id];if(!c){c=document.createElement('canvas');canvases[d.id]=c;placeholder(c)}
+    else if(c.width!==p.w||c.height!==p.h){placeholder(c);dirty[d.id]=1}
     c.setAttribute('role','img');c.setAttribute('aria-label',d.ar+' — '+d.en);
     const s=document.createElement('div');s.className='slide';s.dataset.i=i;s.appendChild(c);
     s.addEventListener('click',()=>{if(i!==S.index)go(i)});frag.appendChild(s);slides.push(s)});
@@ -334,7 +336,7 @@ function nextDirty(){let best=-1,bd=1e9;list.forEach((d,i)=>{if(dirty[d.id]&&can
 function pump(){if(pumping||!canPaint)return;const n=nextDirty();if(!n)return;pumping=true;(n.near?requestAnimationFrame:idle)(tick)}
 function tick(){pumping=false;const n=nextDirty();if(!n)return;
   if(!n.near&&document.hidden){return}
-  const d=list[n.i];delete dirty[d.id];try{paint(canvases[d.id],d,opts())}catch(e){}
+  const d=list[n.i],c=canvases[d.id];delete dirty[d.id];if(c.width!==pvW||c.height!==pvH){c.width=pvW;c.height=pvH}try{paint(c,d,opts())}catch(e){}
   pump()}
 let timer;function schedule(){clearTimeout(timer);invalidateShare();timer=setTimeout(renderAll,120)}
 
