@@ -84,14 +84,15 @@
   <aside class="panel">
     <div class="card">
       <h2 data-i18n="guestSection">بيانات المدعو</h2>
-      <label class="field">
-        <span data-i18n="honorLabel">اللقب</span>
-        <select id="honorSel"></select>
-      </label>
-      <label class="field" id="honorCustomWrap" hidden>
-        <span data-i18n="honorCustomLabel">اللقب المكتوب</span>
-        <input id="honorCustom" type="text" dir="rtl" autocomplete="off" data-i18n-ph="honorCustomPh" placeholder="اكتب اللقب">
-      </label>
+      <div class="field">
+        <label for="honorInput" data-i18n="honorLabel">اللقب</label>
+        <div class="combo">
+          <input id="honorInput" type="text" dir="rtl" autocomplete="off" spellcheck="false" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="honorList" data-i18n-ph="honorPh" placeholder="اختار أو اكتب اللقب">
+          <button type="button" class="combo-toggle" tabindex="-1" data-i18n-aria="showTitles" aria-label="عرض الألقاب"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+          <ul class="combo-list" id="honorList" role="listbox" hidden></ul>
+        </div>
+        <small class="field-hint" data-i18n="honorHint">اكتب أول حروف اللقب عشان تفلتر القائمة، أو اكتب لقب جديد.</small>
+      </div>
       <label class="field">
         <span data-i18n="nameLabel">اسم المدعو</span>
         <input id="guestName" type="text" dir="rtl" autocomplete="off" data-i18n-ph="namePh" placeholder="مثال: محمد عبدالرحمن">
@@ -136,6 +137,14 @@
     </details>
   </aside>
 
+  <nav class="actionbar" aria-label="actions" data-i18n-aria="actionsLabel">
+  <div class="actions">
+    <button type="button" class="btn primary" id="shareBtn" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg><span data-i18n="share">مشاركة</span></button>
+    <button type="button" class="btn" id="dlBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 19h14"/></svg><span data-i18n="download">تنزيل</span></button>
+    <button type="button" class="btn ghost" id="zipBtn" data-i18n-aria="zip" aria-label="الكل ZIP"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zM4 7l2-4h12l2 4M10 11h4"/></svg><span data-i18n="zip">الكل ZIP</span></button>
+  </div>
+</nav>
+
   <section class="editor card" id="editor" aria-labelledby="editorTitle">
     <div class="editor-head">
       <div>
@@ -167,13 +176,6 @@
   <small>© <span id="year">2026</span> Eslam Afify Barakat</small>
 </footer>
 
-<nav class="actionbar" aria-label="actions">
-  <div class="actions">
-    <button type="button" class="btn primary" id="shareBtn" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg><span data-i18n="share">مشاركة</span></button>
-    <button type="button" class="btn" id="dlBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 19h14"/></svg><span data-i18n="download">تنزيل</span></button>
-    <button type="button" class="btn ghost" id="zipBtn" data-i18n-aria="zip" aria-label="الكل ZIP"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zM4 7l2-4h12l2 4M10 11h4"/></svg><span data-i18n="zip">الكل ZIP</span></button>
-  </div>
-</nav>
 
 <div class="sheet" id="shareSheet" hidden>
   <div class="sheet-backdrop" data-close></div>

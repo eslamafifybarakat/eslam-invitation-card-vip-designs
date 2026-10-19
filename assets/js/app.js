@@ -18,9 +18,9 @@ const DEFAULT_CONTENT={
 /* حقول محرر النصوص — key, ar, en, type */
 const FIELD_GROUPS=[
   {ar:'الحفل',en:'Event',f:[['title','عنوان الكارت','Card title'],['greeting','التحية','Greeting'],['bodyLine1','سطر الدعوة الأول','Invitation line 1'],['bodyLine2','سطر الدعوة التاني','Invitation line 2'],['graduate','اسم الخريج','Graduate name'],['academy','الجهة / الكلية','Academy']]},
-  {ar:'الموعد والمكان',en:'Date & place',f:[['date','التاريخ','Date'],['time','الوقت','Time'],['location','المكان','Location'],['mapUrl','لينك اللوكيشن (الباركود)','Location link (QR)','url'],['qrLabel','النص تحت الباركود','Text under QR']]},
+  {ar:'الموعد والمكان',en:'Date & place',f:[['date','التاريخ','Date','date'],['time','الوقت','Time'],['location','المكان','Location'],['mapUrl','لينك اللوكيشن (الباركود)','Location link (QR)','url'],['qrLabel','النص تحت الباركود','Text under QR']]},
   {ar:'الختام والتوقيع',en:'Closing & signature',f:[['closingLine1','سطر الختام الأول','Closing line 1'],['closingLine2','سطر الختام التاني','Closing line 2'],['signature','التوقيع','Signature'],['presentedTo','عنوان خانة المدعو','Guest plaque label'],['sealLetter','حرف الختم','Seal letter','short']]},
-  {ar:'الألقاب والملف',en:'Titles & file',f:[['honorifics','الألقاب (كل لقب في سطر)','Titles (one per line)','list'],['defaultHonorific','اللقب الافتراضي','Default title'],['fileNamePrefix','بداية اسم الملف','File name prefix']]}
+  {ar:'الألقاب والملف',en:'Titles & file',f:[['honorifics','الألقاب (كل لقب في سطر)','Titles (one per line)','list'],['defaultHonorific','اللقب الافتراضي','Default title','combo'],['fileNamePrefix','بداية اسم الملف','File name prefix']]}
 ];
 
 const SIZES=[
@@ -35,7 +35,9 @@ const SIZES=[
 const I18N={
  ar:{docTitle:'كروت دعوة VIP — صمّم كارت دعوة فاخر وشاركه على واتساب في ثواني',appTitle:'كروت دعوة VIP',subtitle:'اختار التصميم، اكتب اسم المدعو، وشاركه في ثانية',designs:'التصميمات',
   filterAll:'الكل',filterTop:'الاسم فوق',filterBottom:'الاسم تحت',prev:'السابق',next:'التالي',
-  guestSection:'بيانات المدعو',honorLabel:'اللقب',honorCustomLabel:'اللقب المكتوب',honorCustomPh:'اكتب اللقب',customOpt:'✍️ كتابة يدوية…',
+  guestSection:'بيانات المدعو',honorLabel:'اللقب',honorPh:'اختار أو اكتب اللقب',showTitles:'عرض الألقاب',honorHint:'اكتب أول حروف اللقب عشان تفلتر القائمة، أو اكتب لقب جديد.',
+  comboEmpty:'مفيش لقب بالاسم ده — «{v}» هيتكتب زي ما هو',actionsLabel:'مشاركة وتنزيل',
+  pickDate:'اختار التاريخ',todayBtn:'النهارده',prevMonth:'الشهر اللي فات',nextMonth:'الشهر الجاي',pastDisabled:'الأيام اللي فاتت مقفولة',
   nameLabel:'اسم المدعو',namePh:'مثال: محمد عبدالرحمن',sizeSection:'المقاس والجودة',width:'العرض',height:'الارتفاع',
   q1:'عادية',q2:'عالية ×2',output:'الصورة النهائية:',fontSection:'حجم الخط',reset:'رجوع للأصل',
   fontHint:'الخط بيكبر ويصغر والتصميم بيظبط المسافات تلقائيًا على أي مقاس.',
@@ -60,7 +62,9 @@ const I18N={
   about:'كروت دعوة VIP: 16 تصميم ذهبي فاخر لدعوات حفلات التخرج والمناسبات. اختار اللقب واكتب اسم المدعو، عدّل النصوص ولينك اللوكيشن (الباركود بيتعمل تلقائيًا)، ونزّل الكارت بمقاس واتساب أو ستوري أو طباعة A5، وشاركه على كل التطبيقات.'},
  en:{docTitle:'VIP Invitation Cards — Design a luxury invitation and share it on WhatsApp',appTitle:'VIP Invitation Cards',subtitle:'Pick a design, add the guest name, share in seconds',designs:'Designs',
   filterAll:'All',filterTop:'Name on top',filterBottom:'Name at bottom',prev:'Previous',next:'Next',
-  guestSection:'Guest details',honorLabel:'Title',honorCustomLabel:'Custom title',honorCustomPh:'Type the title',customOpt:'✍️ Write manually…',
+  guestSection:'Guest details',honorLabel:'Title',honorPh:'Pick or type a title',showTitles:'Show titles',honorHint:'Type the first letters to filter the list, or write a new title.',
+  comboEmpty:'No matching title — “{v}” will be used as typed',actionsLabel:'Share & download',
+  pickDate:'Pick the date',todayBtn:'Today',prevMonth:'Previous month',nextMonth:'Next month',pastDisabled:'Past days are disabled',
   nameLabel:'Guest name',namePh:'e.g. محمد عبدالرحمن',sizeSection:'Size & quality',width:'Width',height:'Height',
   q1:'Standard',q2:'HD ×2',output:'Output:',fontSection:'Text size',reset:'Reset',
   fontHint:'Text scales up or down and the layout re-balances itself for any size.',
@@ -92,7 +96,7 @@ const S={
   lang:store.get('lang','ar'),filter:'all',index:0,
   size:store.get('size','feed'),cw:store.get('cw',1200),ch:store.get('ch',1600),
   q:store.get('q',2),fmt:store.get('fmt','jpg'),fs:store.get('fs',100),
-  honor:'',custom:false,name:'',
+  honor:'',honorTouched:false,name:'',
   base:Object.assign({},DEFAULT_CONTENT),baseSrc:'fallback',C:Object.assign({},DEFAULT_CONTENT),edited:false
 };
 const $=id=>document.getElementById(id);
@@ -130,17 +134,117 @@ function applyLang(){
 
 /* ---------- honorifics ---------- */
 function buildHonors(){
-  const sel=$('honorSel');const cur=S.custom?'__custom':(S.honor||S.C.defaultHonorific);
-  sel.innerHTML='';(S.C.honorifics||[]).forEach(h=>{const o=document.createElement('option');o.value=h;o.textContent=h;sel.appendChild(o)});
-  const o=document.createElement('option');o.value='__custom';o.textContent=t('customOpt');sel.appendChild(o);
-  const vals=[].map.call(sel.options,x=>x.value);
-  sel.value=vals.indexOf(cur)>-1?cur:vals.indexOf(S.C.defaultHonorific)>-1?S.C.defaultHonorific:(S.C.honorifics||[])[0]||'__custom';
-  onHonor(false);
+  /* لو المستخدم لسه مختارش لقب، نحط اللقب الافتراضي من النصوص */
+  if(!S.honorTouched){S.honor=S.C.defaultHonorific||(S.C.honorifics||[])[0]||'';$('honorInput').value=S.honor}
 }
-function onHonor(redraw){
-  const v=$('honorSel').value;S.custom=v==='__custom';$('honorCustomWrap').hidden=!S.custom;
-  S.honor=S.custom?$('honorCustom').value.trim():v;if(redraw!==false)schedule();
+
+/* ---------- combobox: قائمة مخصصة بتتفلتر وانت بتكتب ---------- */
+const normAr=v=>String(v||'').toLowerCase().replace(/[\u064B-\u0652\u0640]/g,'').replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').replace(/\s+/g,' ').trim();
+function combo(input,list,cfg){
+  const box=input.parentNode,id=list.id;let items=[],active=-1,open=false;
+  function setActive(i){active=i;[].forEach.call(list.children,(li,k)=>li.classList.toggle('active',k===i));
+    if(i>-1&&list.children[i]){input.setAttribute('aria-activedescendant',id+'_'+i);const li=list.children[i];
+      if(li.offsetTop<list.scrollTop)list.scrollTop=li.offsetTop;else if(li.offsetTop+li.offsetHeight>list.scrollTop+list.clientHeight)list.scrollTop=li.offsetTop+li.offsetHeight-list.clientHeight}
+    else input.removeAttribute('aria-activedescendant')}
+  function render(q){
+    const all=cfg.options(),n=normAr(q),cur=input.value.trim();
+    items=n?all.filter(o=>normAr(o).indexOf(n)>-1):all.slice();
+    if(n)items.sort((a,b)=>(normAr(a).indexOf(n)===0?0:1)-(normAr(b).indexOf(n)===0?0:1));
+    list.innerHTML='';
+    items.forEach((o,i)=>{const li=document.createElement('li');li.id=id+'_'+i;li.setAttribute('role','option');li.dataset.i=i;
+      li.setAttribute('aria-selected',String(o===cur));
+      const k=n&&normAr(o).length===o.length?normAr(o).indexOf(n):-1;
+      if(k>-1){li.appendChild(document.createTextNode(o.slice(0,k)));const b=document.createElement('mark');b.textContent=o.slice(k,k+n.length);li.appendChild(b);li.appendChild(document.createTextNode(o.slice(k+n.length)))}
+      else li.textContent=o;
+      list.appendChild(li)});
+    if(!items.length){const li=document.createElement('li');li.className='combo-empty';li.textContent=t('comboEmpty').replace('{v}',q.trim());list.appendChild(li)}
+    setActive(items.indexOf(cur));
+  }
+  function show(q){render(q==null?'':q);list.hidden=false;open=true;input.setAttribute('aria-expanded','true');box.classList.add('open')}
+  function hide(){if(!open)return;list.hidden=true;open=false;input.setAttribute('aria-expanded','false');box.classList.remove('open');input.removeAttribute('aria-activedescendant')}
+  function pick(i){const v=items[i];if(v==null)return;input.value=v;hide();cfg.onChange(v)}
+  input.addEventListener('focus',()=>show(''));
+  input.addEventListener('click',()=>{if(!open)show('')});
+  input.addEventListener('input',()=>{show(input.value);cfg.onChange(input.value)});
+  input.addEventListener('keydown',e=>{
+    if(e.key==='ArrowDown'){e.preventDefault();if(!open)show('');else if(items.length)setActive(Math.min(items.length-1,active+1))}
+    else if(e.key==='ArrowUp'){e.preventDefault();if(open&&items.length)setActive(Math.max(0,active-1))}
+    else if(e.key==='Enter'){if(open){e.preventDefault();if(active>-1)pick(active);else hide()}}
+    else if(e.key==='Escape'){if(open){e.preventDefault();e.stopPropagation();hide()}}
+    else if(e.key==='Tab')hide()});
+  input.addEventListener('blur',()=>setTimeout(()=>{if(document.activeElement!==input)hide()},150));
+  list.addEventListener('mousedown',e=>e.preventDefault());
+  list.addEventListener('click',e=>{const li=e.target.closest('li[role="option"]');if(li)pick(+li.dataset.i)});
+  const tg=box.querySelector('.combo-toggle');
+  if(tg){tg.addEventListener('mousedown',e=>e.preventDefault());tg.addEventListener('click',()=>{if(open)hide();else{input.focus();show('')}})}
+  return{hide:hide};
 }
+
+/* ---------- date picker: تقويم مخصص، أقل تاريخ النهارده ---------- */
+const AR_MONTHS=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+const EN_MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const AR_DAYS=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+const WD={ar:['ح','ن','ث','ر','خ','ج','س'],en:['Su','Mo','Tu','We','Th','Fr','Sa']};
+const MONTH_ALIASES=[['يناير','january','jan'],['فبراير','february','feb'],['مارس','march','mar'],['ابريل','april','apr'],['مايو','may'],['يونيو','يونيه','june','jun'],['يوليو','يوليه','july','jul'],['اغسطس','august','aug'],['سبتمبر','september','sep'],['اكتوبر','october','oct'],['نوفمبر','november','nov'],['ديسمبر','december','dec']];
+function today0(){const d=new Date();d.setHours(0,0,0,0);return d}
+function fmtArDate(d){return AR_DAYS[d.getDay()]+' '+d.getDate()+' '+AR_MONTHS[d.getMonth()]+' '+d.getFullYear()}
+function parseDate(str){
+  let v=String(str||'').replace(/[٠-٩]/g,c=>c.charCodeAt(0)-1632).replace(/[۰-۹]/g,c=>c.charCodeAt(0)-1776);
+  let y,m=-1,d;const iso=v.match(/(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})/),dmy=v.match(/(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})/);
+  if(iso){y=+iso[1];m=+iso[2]-1;d=+iso[3]}else if(dmy){d=+dmy[1];m=+dmy[2]-1;y=+dmy[3]}
+  else{const ym=v.match(/\d{4}/);if(!ym)return null;y=+ym[0];const dm=v.replace(ym[0],'').match(/\d{1,2}/);if(!dm)return null;d=+dm[0];
+    const n=normAr(v);MONTH_ALIASES.some((a,i)=>{if(a.some(x=>new RegExp('(^|[^a-z])'+normAr(x)+'([^a-z]|$)').test(n))){m=i;return true}return false})}
+  if(m<0||m>11||!d)return null;const out=new Date(y,m,d);return out.getMonth()===m?out:null;
+}
+function datePicker(wrap,onPick){
+  const btn=wrap.querySelector('.date-btn'),txt=wrap.querySelector('.date-txt'),hid=wrap.querySelector('input[type="hidden"]'),cal=wrap.querySelector('.cal');
+  let view=null,sel=null,focus=null;
+  const sameDay=(a,b)=>a&&b&&a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();
+  function sync(){sel=parseDate(hid.value);txt.textContent=hid.value||t('pickDate');btn.classList.toggle('empty',!hid.value)}
+  function render(){
+    const T=today0(),ar=S.lang==='ar',start=ar?6:0;
+    const y=view.getFullYear(),mo=view.getMonth();
+    const canPrev=y>T.getFullYear()||(y===T.getFullYear()&&mo>T.getMonth());
+    let h='<div class="cal-head"><button type="button" class="cal-nav" data-nav="-1" aria-label="'+t('prevMonth')+'"'+(canPrev?'':' disabled')+'><svg viewBox="0 0 24 24" aria-hidden="true"><path d="'+(ar?'M9 6l6 6-6 6':'M15 6l-6 6 6 6')+'"/></svg></button>'
+      +'<b aria-live="polite">'+(ar?AR_MONTHS:EN_MONTHS)[mo]+' '+y+'</b>'
+      +'<button type="button" class="cal-nav" data-nav="1" aria-label="'+t('nextMonth')+'"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="'+(ar?'M15 6l-6 6 6 6':'M9 6l6 6-6 6')+'"/></svg></button></div><div class="cal-grid" role="grid">';
+    for(let i=0;i<7;i++)h+='<span class="cal-wd" aria-hidden="true">'+WD[ar?'ar':'en'][(start+i)%7]+'</span>';
+    const first=new Date(y,mo,1),lead=(first.getDay()-start+7)%7,dim=new Date(y,mo+1,0).getDate();
+    for(let i=0;i<lead;i++)h+='<span></span>';
+    for(let d=1;d<=dim;d++){const dt=new Date(y,mo,d),past=dt<T,isSel=sameDay(dt,sel),isT=sameDay(dt,T),isF=sameDay(dt,focus);
+      h+='<button type="button" class="cal-day'+(isT?' today':'')+(isSel?' sel':'')+'" data-d="'+d+'" tabindex="'+(isF?0:-1)+'"'+(past?' disabled':'')
+        +' aria-pressed="'+isSel+'" aria-label="'+fmtArDate(dt)+'">'+d+'</button>'}
+    h+='</div><div class="cal-foot"><small>'+t('pastDisabled')+'</small><button type="button" class="link" data-today>'+t('todayBtn')+'</button></div>';
+    cal.innerHTML=h;
+  }
+  function focusDay(){const b=cal.querySelector('.cal-day[tabindex="0"]');if(b)b.focus()}
+  function moveTo(d){const T=today0();if(d<T)d=T;focus=d;if(d.getMonth()!==view.getMonth()||d.getFullYear()!==view.getFullYear())view=new Date(d.getFullYear(),d.getMonth(),1);render();focusDay()}
+  function openCal(){sync();const T=today0();focus=sel&&sel>=T?sel:T;view=new Date(focus.getFullYear(),focus.getMonth(),1);render();cal.hidden=false;btn.setAttribute('aria-expanded','true');wrap.classList.add('open');focusDay()}
+  function closeCal(refocus){if(cal.hidden)return;cal.hidden=true;btn.setAttribute('aria-expanded','false');wrap.classList.remove('open');if(refocus)btn.focus()}
+  function choose(d){hid.value=fmtArDate(d);sync();closeCal(true);onPick(hid.value)}
+  btn.addEventListener('click',()=>cal.hidden?openCal():closeCal(false));
+  cal.addEventListener('click',e=>{const n=e.target.closest('[data-nav]');
+    if(n&&!n.disabled){view=new Date(view.getFullYear(),view.getMonth()+(+n.dataset.nav),1);const T=today0();focus=view<T?T:view;render();return}
+    const d=e.target.closest('.cal-day');if(d&&!d.disabled){choose(new Date(view.getFullYear(),view.getMonth(),+d.dataset.d));return}
+    if(e.target.closest('[data-today]'))choose(today0())});
+  cal.addEventListener('keydown',e=>{
+    if(e.key==='Escape'){e.preventDefault();e.stopPropagation();closeCal(true);return}
+    if(!e.target.classList.contains('cal-day'))return;
+    const rtl=document.documentElement.dir==='rtl',f=focus||today0();let n=null;
+    if(e.key==='ArrowRight')n=new Date(f.getFullYear(),f.getMonth(),f.getDate()+(rtl?-1:1));
+    else if(e.key==='ArrowLeft')n=new Date(f.getFullYear(),f.getMonth(),f.getDate()+(rtl?1:-1));
+    else if(e.key==='ArrowUp')n=new Date(f.getFullYear(),f.getMonth(),f.getDate()-7);
+    else if(e.key==='ArrowDown')n=new Date(f.getFullYear(),f.getMonth(),f.getDate()+7);
+    else if(e.key==='PageUp')n=new Date(f.getFullYear(),f.getMonth()-1,f.getDate());
+    else if(e.key==='PageDown')n=new Date(f.getFullYear(),f.getMonth()+1,f.getDate());
+    else if(e.key==='Home')n=today0();
+    if(n){e.preventDefault();moveTo(n)}});
+  document.addEventListener('mousedown',e=>{if(!cal.hidden&&!wrap.contains(e.target))closeCal(false)});
+  document.addEventListener('touchstart',e=>{if(!cal.hidden&&!wrap.contains(e.target))closeCal(false)},{passive:true});
+  wrap.addEventListener('focusout',e=>{if(e.relatedTarget&&!wrap.contains(e.relatedTarget))closeCal(false)});
+  return{sync:sync,close:closeCal};
+}
+let edDate=null;
 
 /* ---------- sizes ---------- */
 function curSize(){const z=SIZES.find(x=>x.id===S.size)||SIZES[0];if(z.id!=='custom')return{w:z.w,h:z.h};
@@ -390,7 +494,20 @@ function buildEditor(){
   FIELD_GROUPS.forEach(g=>{
     const fs=document.createElement('fieldset');fs.className='ed-group';const lg=document.createElement('legend');lg.dataset.g=g.ar;fs.appendChild(lg);
     g.f.forEach(f=>{
-      const [k,,,type]=f;const lab=document.createElement('label');lab.className='field'+(type==='list'?' wide':'');lab.htmlFor=fieldId(k);
+      const [k,,,type]=f;
+      if(type==='date'||type==='combo'){
+        /* div مش label عشان الضغط جوه التقويم/القائمة ميفتحش ويقفل الحقل */
+        const fd=document.createElement('div');fd.className='field';const lb=document.createElement('label');lb.dataset.k=k;fd.appendChild(lb);
+        if(type==='date'){lb.htmlFor='edDateBtn';
+          fd.insertAdjacentHTML('beforeend','<div class="datepick"><input type="hidden" id="'+fieldId(k)+'" name="'+k+'">'
+            +'<button type="button" class="date-btn" id="edDateBtn" aria-haspopup="dialog" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span class="date-txt"></span><svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>'
+            +'<div class="cal" role="dialog" aria-label="'+t('pickDate')+'" hidden></div></div>')}
+        else{lb.htmlFor=fieldId(k);
+          fd.insertAdjacentHTML('beforeend','<div class="combo"><input type="text" id="'+fieldId(k)+'" name="'+k+'" dir="auto" autocomplete="off" spellcheck="false" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="'+fieldId(k)+'_list">'
+            +'<button type="button" class="combo-toggle" tabindex="-1" aria-label="'+t('showTitles')+'"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>'
+            +'<ul class="combo-list" id="'+fieldId(k)+'_list" role="listbox" hidden></ul></div>')}
+        fs.appendChild(fd);return}
+      const lab=document.createElement('label');lab.className='field'+(type==='list'?' wide':'');lab.htmlFor=fieldId(k);
       const sp=document.createElement('span');sp.dataset.k=k;lab.appendChild(sp);
       let inp;
       if(type==='list'){inp=document.createElement('textarea');inp.rows=4}
@@ -402,16 +519,20 @@ function buildEditor(){
       else lab.appendChild(inp);
       fs.appendChild(lab)});
     box.appendChild(fs)});
+  edDate=datePicker(document.querySelector('#editorForm .datepick'),()=>markDirty());
+  combo($(fieldId('defaultHonorific')),$(fieldId('defaultHonorific')+'_list'),{
+    options:()=>$(fieldId('honorifics')).value.split(/[\n,،]+/).map(x=>x.trim()).filter(Boolean),onChange:()=>markDirty()});
   fillEditor(S.C);
 }
 function buildEditorLabels(){
   FIELD_GROUPS.forEach(g=>{const lg=document.querySelector('legend[data-g="'+g.ar+'"]');if(lg)lg.textContent=S.lang==='ar'?g.ar:g.en;
-    g.f.forEach(f=>{const sp=document.querySelector('#editorForm span[data-k="'+f[0]+'"]');if(sp)sp.textContent=S.lang==='ar'?f[1]:f[2]})});
+    g.f.forEach(f=>{const sp=document.querySelector('#editorForm [data-k="'+f[0]+'"]');if(sp)sp.textContent=S.lang==='ar'?f[1]:f[2]})});
+  if(edDate)edDate.sync();
   const a=$('edMapOpen');if(a)a.querySelector('span').textContent=t('openMap');
 }
 function fillEditor(C){
   FIELD_GROUPS.forEach(g=>g.f.forEach(f=>{const el=$(fieldId(f[0]));if(!el)return;const v=C[f[0]];el.value=Array.isArray(v)?v.join('\n'):(v==null?'':v)}));
-  syncMapLink();markDirty();
+  syncMapLink();if(edDate)edDate.sync();markDirty();
 }
 function readEditor(){
   const o={};
@@ -465,8 +586,7 @@ async function init(){
   $('track').addEventListener('keydown',e=>{const rtl=document.documentElement.dir==='rtl';
     if(e.key==='ArrowRight'){e.preventDefault();go(S.index+(rtl?-1:1))}if(e.key==='ArrowLeft'){e.preventDefault();go(S.index+(rtl?1:-1))}});
   $('prevBtn').addEventListener('click',()=>go(S.index-1));$('nextBtn').addEventListener('click',()=>go(S.index+1));
-  $('honorSel').addEventListener('change',()=>{onHonor();if(S.custom)$('honorCustom').focus()});
-  $('honorCustom').addEventListener('input',()=>onHonor());
+  combo($('honorInput'),$('honorList'),{options:()=>S.C.honorifics||[],onChange:v=>{S.honorTouched=true;S.honor=v.trim();schedule()}});
   $('guestName').addEventListener('input',e=>{S.name=e.target.value.trim();schedule()});
   $('quality').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.q=+b.dataset.q;store.set('q',S.q);invalidateShare();buildSizes()});
   $('format').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.fmt=b.dataset.f;store.set('fmt',S.fmt);invalidateShare();buildSizes()});
