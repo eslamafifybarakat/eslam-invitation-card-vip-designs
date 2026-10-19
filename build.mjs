@@ -31,10 +31,21 @@ html = html
   .replace(/<link rel="stylesheet" href="assets\/css\/fonts\.css">\s*/, '')
   .replace(/<link rel="stylesheet" href="assets\/css\/styles\.css">/, `<style>${minCss(css)}</style>`);
 
-// fingerprint scripts
+// fingerprint scripts; the worker's importScripts and app.js's worker URL are
+// versioned too, so the year-long immutable cache never serves a stale file
+const v = (f) => hash(readFileSync(f));
+let worker = readFileSync('assets/js/paint-worker.js', 'utf8')
+  .replace("'vendor/qrcode.min.js'", `'vendor/qrcode.min.js?v=${v('assets/js/vendor/qrcode.min.js')}'`)
+  .replace("'designs.js'", `'designs.js?v=${v('assets/js/designs.js')}'`);
+writeFileSync(`${OUT}/assets/js/paint-worker.js`, worker);
+let app = readFileSync('assets/js/app.js', 'utf8')
+  .replace("'assets/js/paint-worker.js'", `'assets/js/paint-worker.js?v=${hash(worker)}'`);
+if (!app.includes('paint-worker.js?v=')) throw new Error('worker URL not versioned');
+writeFileSync(`${OUT}/assets/js/app.js`, app);
+const built = { 'assets/js/app.js': app };
 html = html.replace(/<script src="(assets\/js\/[^"]+)"/g, (m, src) => {
   if (!existsSync(src)) throw new Error(`missing ${src}`);
-  return `<script src="${src}?v=${hash(readFileSync(src))}"`;
+  return `<script src="${src}?v=${hash(built[src] || readFileSync(src))}"`;
 });
 
 writeFileSync(`${OUT}/index.html`, html);

@@ -49,10 +49,12 @@
   function diamond(ctx,x,y,s){ctx.beginPath();ctx.moveTo(x,y-s);ctx.lineTo(x+s,y);ctx.lineTo(x,y+s);ctx.lineTo(x-s,y);ctx.closePath();ctx.fill()}
   function star8(ctx,cx,cy,r,k){ctx.beginPath();for(let i=0;i<16;i++){const a=i*Math.PI/8-Math.PI/2;const rr=i%2?r*(k||0.62):r;ctx.lineTo(cx+rr*Math.cos(a),cy+rr*Math.sin(a))}ctx.closePath()}
   /* ملمس الحبيبات: بيتولد صفوف صفوف (نفس النتيجة بالظبط) عشان التسخين يقسمه على كذا مهمة صغيرة */
+  /* كانفاس في الصفحة، أو OffscreenCanvas جوه الـ worker */
+  function mkCanvas(w,h){if(typeof document!=='undefined'){const c=document.createElement('canvas');c.width=w;c.height=h;return c}return new OffscreenCanvas(w,h)}
   let NOISE=null,NOISE_X=null,NOISE_R=null,NOISE_ROWS=0;
   function noiseRows(n){
     /* willReadFrequently = كانفاس على المعالج، مبيستناش تجهيز كارت الشاشة */
-    if(!NOISE){NOISE=document.createElement('canvas');NOISE.width=NOISE.height=240;NOISE_X=NOISE.getContext('2d',{willReadFrequently:true})||NOISE.getContext('2d');NOISE_R=rng(99)}
+    if(!NOISE){NOISE=mkCanvas(240,240);NOISE_X=NOISE.getContext('2d',{willReadFrequently:true})||NOISE.getContext('2d');NOISE_R=rng(99)}
     const end=Math.min(240,NOISE_ROWS+n);if(end<=NOISE_ROWS)return;
     const im=NOISE_X.createImageData(240,end-NOISE_ROWS),r=NOISE_R;
     for(let i=0;i<im.data.length;i+=4){const v=r()*255;im.data[i]=im.data[i+1]=im.data[i+2]=v;im.data[i+3]=255}
@@ -280,7 +282,7 @@
 
   /* تسخين قبل أول رسم: كل خطوة مهمة صغيرة لوحدها عشان الصفحة متهنجش (الباركود، الملمس، كل وزن خط) */
   function warmSteps(C){
-    const wc=document.createElement('canvas').getContext('2d');wc.direction='rtl';
+    const wc=mkCanvas(8,8).getContext('2d');wc.direction='rtl';
     const sample=[C.title,C.greeting,C.bodyLine1,C.graduate,C.date,C.location,C.signature,'سيادة / 0123456789'].filter(Boolean).join(' ');
     const shape=(w,s,f,t)=>()=>{wc.font=font(w,s,f);wc.measureText(t)};
     const grain=[0,1,2,3,4,5].map(()=>()=>noiseRows(40));
@@ -288,4 +290,4 @@
   }
 
   global.VIPCards={DESIGNS,paint,qrMatrix,warmSteps};
-})(window);
+})(typeof window!=='undefined'?window:self);

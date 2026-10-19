@@ -303,15 +303,17 @@ function resizeCanvases(force){
   pvW=p.w;pvH=p.h;Object.keys(canvases).forEach(id=>placeholder(canvases[id]));renderAll();
 }
 /* الكانفاس بيبدأ صغير بنفس النسبة (ذاكرة أقل بكتير) وبياخد حجمه الحقيقي لحظة الرسم بس */
-function placeholder(c){const k=Math.max(pvW,pvH)/64;c.width=Math.max(1,Math.round(pvW/k));c.height=Math.max(1,Math.round(pvH/k))}
+const csz={};
+function placeholder(c){const k=Math.max(pvW,pvH)/64,w=Math.max(1,Math.round(pvW/k)),h=Math.max(1,Math.round(pvH/k));csz[c.__id]={w:w,h:h};
+  if(c.__off){W.postMessage({type:'size',id:c.__id,w:w,h:h})}else{c.width=w;c.height=h}}
 function buildSlider(){
   list=DESIGNS.slice();
   const track=$('track');track.innerHTML='';slides=[];
   setAR();const p=previewDims();pvW=p.w;pvH=p.h;
   const frag=document.createDocumentFragment();
   list.forEach((d,i)=>{
-    let c=canvases[d.id];if(!c){c=document.createElement('canvas');canvases[d.id]=c;placeholder(c)}
-    else if(c.width!==p.w||c.height!==p.h){placeholder(c);dirty[d.id]=1}
+    let c=canvases[d.id];if(!c){c=document.createElement('canvas');c.__id=d.id;canvases[d.id]=c;placeholder(c);if(wReady)transferCanvas(c)}
+    else{const z=csz[d.id];if(!z||z.w!==p.w||z.h!==p.h){placeholder(c);dirty[d.id]=1}}
     c.setAttribute('role','img');c.setAttribute('aria-label',d.ar+' — '+d.en);
     const s=document.createElement('div');s.className='slide';s.dataset.i=i;s.appendChild(c);
     s.addEventListener('click',()=>{if(i!==S.index)go(i)});frag.appendChild(s);slides.push(s)});
@@ -362,18 +364,52 @@ function renderAll(){DESIGNS.forEach(d=>{dirty[d.id]=1});pump()}
 const AHEAD=2;
 function nextDirty(){let best=-1,bd=1e9;list.forEach((d,i)=>{if(dirty[d.id]&&canvases[d.id]){const dd=Math.abs(i-S.index);if(dd<bd){bd=dd;best=i}}});return best<0||bd>AHEAD?null:{i:best,near:bd===0}}
 function pump(){if(pumping||!canPaint)return;const n=nextDirty();if(!n)return;pumping=true;(n.near?requestAnimationFrame:idle)(tick)}
-function tick(){pumping=false;const n=nextDirty();if(!n)return;
+function tick(){pumping=false;if(wBusy)return;const n=nextDirty();if(!n)return;
   if(!n.near&&document.hidden){return}
-  const d=list[n.i],c=canvases[d.id];delete dirty[d.id];if(c.width!==pvW||c.height!==pvH){c.width=pvW;c.height=pvH}try{paint(c,d,opts())}catch(e){}
+  const d=list[n.i],c=canvases[d.id];delete dirty[d.id];csz[d.id]={w:pvW,h:pvH};
+  /* في وضع الـ worker: كارت واحد في المرة، والكارت الجاي بيتبعت لما ده يخلص */
+  if(c.__off){wBusy=true;W.postMessage({type:'paint',id:d.id,w:pvW,h:pvH,o:opts()});return}
+  if(c.width!==pvW||c.height!==pvH){c.width=pvW;c.height=pvH}try{paint(c,d,opts())}catch(e){}
   pump()}
+
+/* ---------- رسم في الخلفية (Web Worker + OffscreenCanvas) لو المتصفح بيدعمه ---------- */
+let W=null,wReady=false,wBusy=false,reqN=0;const wReqs={};
+function workerCapable(){try{return !!(window.Worker&&window.OffscreenCanvas&&HTMLCanvasElement.prototype.transferControlToOffscreen&&
+  window.CSS&&CSS.supports&&CSS.supports('aspect-ratio','1')&&document.fonts&&document.fonts.forEach&&new OffscreenCanvas(1,1).getContext('2d'))}catch(_){return false}}
+/* الخطوط بتتاخد من قواعد @font-face بتاعة الصفحة نفسها */
+function fontDescriptors(){const out=[],base=new URL('assets/fonts/',location.href).href;
+  document.fonts.forEach(f=>{const fam=f.family.replace(/["']/g,''),ar=/U\+0?600/i.test(f.unicodeRange);
+    const file=fam==='Alexandria'?'Alexandria-'+(ar?'arabic':'latin'):fam==='Aref Ruqaa'?'ArefRuqaa-700-'+(ar?'arabic':'latin'):'';
+    if(file)out.push({family:fam,url:base+file+'.woff2',weight:f.weight,style:f.style,unicodeRange:f.unicodeRange})});
+  return out}
+function startWorker(){return new Promise(res=>{
+  if(!workerCapable())return res(false);
+  let w;try{w=new Worker('assets/js/paint-worker.js')}catch(_){return res(false)}
+  const fail=()=>{clearTimeout(to);try{w.terminate()}catch(_){}res(false)};
+  const to=setTimeout(fail,4000);
+  w.onerror=e=>{if(!wReady){if(e&&e.preventDefault)e.preventDefault();fail()}};
+  w.onmessage=e=>{const m=e.data;
+    if(m.type==='ready'){clearTimeout(to);W=w;wReady=true;res(true)}
+    else if(m.type==='painted'){wBusy=false;pump()}
+    else if(m.type==='blob'){const r=wReqs[m.req];if(r){delete wReqs[m.req];r.res(m.blob)}}
+    else if(m.type==='error'){
+      if(m.stage==='init'&&!wReady)fail();
+      else if(m.req&&wReqs[m.req]){wReqs[m.req].rej(new Error(m.message));delete wReqs[m.req]}
+      else if(m.stage==='paint'){wBusy=false;pump()}}};
+  w.postMessage({type:'init',fonts:fontDescriptors(),C:S.C});
+})}
+function transferCanvas(c){if(c.__off)return;const off=c.transferControlToOffscreen();c.__off=true;
+  const z=csz[c.__id]||{w:pvW,h:pvH};off.width=z.w;off.height=z.h;W.postMessage({type:'canvas',id:c.__id,canvas:off},[off])}
 let timer;function schedule(){clearTimeout(timer);invalidateShare();timer=setTimeout(renderAll,120)}
 
 /* ---------- export ---------- */
 function safe(s){return String(s||'').replace(/[\\/:*?"<>|]+/g,'').replace(/\s+/g,' ').trim()}
 function fileName(d,fmt){const o=outDims();return safe([S.C.fileNamePrefix||'دعوة',S.general?t('generalFile'):S.name,d.ar,o.w+'x'+o.h].filter(Boolean).join(' - '))+'.'+(fmt||S.fmt)}
 function exportBlob(d,fmt){
-  fmt=fmt||S.fmt;const o=outDims();const c=document.createElement('canvas');c.width=o.w;c.height=o.h;paint(c,d,opts());
-  const type=fmt==='png'?'image/png':'image/jpeg';
+  fmt=fmt||S.fmt;const o=outDims();const type=fmt==='png'?'image/png':'image/jpeg';
+  /* التصدير بالجودة العالية بيحصل في الـ worker، فالصفحة متقفش وهو بيجهز الصورة */
+  if(W&&wReady)return new Promise((res,rej)=>{const req=++reqN;wReqs[req]={res:res,rej:rej};W.postMessage({type:'export',req:req,id:d.id,w:o.w,h:o.h,o:opts(),mime:type})});
+  const c=document.createElement('canvas');c.width=o.w;c.height=o.h;paint(c,d,opts());
   return new Promise((res,rej)=>{
     if(c.toBlob)c.toBlob(b=>{c.width=c.height=0;b?res(b):rej(new Error('blob'))},type,0.93);
     else{try{const u=c.toDataURL(type,0.93);const bin=atob(u.split(',')[1]);const a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);res(new Blob([a],{type:type}))}catch(e){rej(e)}}
@@ -605,17 +641,20 @@ function toast(m){const e=$('toast');e.textContent=m;e.classList.add('show');cle
 
 /* ---------- wire up ---------- */
 async function init(){
-  const fontsP=(document.fonts&&document.fonts.load)?Promise.all(['300','400','600','700'].map(w=>document.fonts.load(w+' 30px "Alexandria"','دعوة سيادة 2026'))
-    .concat(document.fonts.load('700 60px "Aref Ruqaa"','دعوة'))).catch(()=>{}):Promise.resolve();
   await loadBase();applyContent();
   $('fs').value=S.fs;$('fsVal').textContent=S.fs+'%';$('cw').value=S.cw;$('ch').value=S.ch;
   const y=$('year');if(y)y.textContent=new Date().getFullYear();
   applyLang();applyGeneral();applyPos();buildSlider();
   /* محرر النصوص تحت الصفحة، فبيتبني في مهمة لوحده بعد أول رسم */
   setTimeout(()=>{buildEditor();buildEditorLabels();textsStatus()},0);
-  /* الرسم بيستنى الخطوط بحد أقصى 2.5 ثانية عشان الكروت متترسمش بخط غلط */
-  Promise.race([fontsP,new Promise(r=>setTimeout(r,2500))]).then(()=>warmUp()).then(()=>{canPaint=true;renderAll();
-    if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>renderAll())});
+  startWorker().then(ok=>{
+    if(ok){Object.keys(canvases).forEach(id=>transferCanvas(canvases[id]));canPaint=true;renderAll();return}
+    /* من غير worker: الرسم بيستنى الخطوط بحد أقصى 2.5 ثانية عشان الكروت متترسمش بخط غلط */
+    const fontsP=(document.fonts&&document.fonts.load)?Promise.all(['300','400','600','700'].map(w=>document.fonts.load(w+' 30px "Alexandria"','دعوة سيادة 2026'))
+      .concat(document.fonts.load('700 60px "Aref Ruqaa"','دعوة'))).catch(()=>{}):Promise.resolve();
+    Promise.race([fontsP,new Promise(r=>setTimeout(r,2500))]).then(()=>warmUp()).then(()=>{canPaint=true;renderAll();
+      if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>renderAll())});
+  });
 
   $('langBtn').addEventListener('click',()=>{S.lang=S.lang==='ar'?'en':'ar';store.set('lang',S.lang);applyLang();requestAnimationFrame(()=>{padTrack();go(S.index,false)})});
   $('posSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.dataset.pos===S.pos)return;
