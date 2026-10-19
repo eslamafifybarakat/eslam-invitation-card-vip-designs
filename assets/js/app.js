@@ -15,6 +15,9 @@ const DEFAULT_CONTENT={
   signature:"المهندس / حسن عبدالعزيز بركات",presentedTo:"مقدّمة إلى",sealLetter:"و",fileNamePrefix:"دعوة"
 };
 
+/* أيقونات حقول محرر النصوص */
+const FIELD_ICONS={"title":"<path d=\"M4 7V4h16v3\"/><path d=\"M9 20h6\"/><path d=\"M12 4v16\"/>","greeting":"<path d=\"M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z\"/>","bodyLine1":"<path d=\"M21 6H3\"/><path d=\"M21 12H9\"/><path d=\"M21 18H7\"/>","bodyLine2":"<path d=\"M21 6H3\"/><path d=\"M21 12H9\"/><path d=\"M21 18H7\"/>","graduate":"<path d=\"M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z\"/><path d=\"M22 10v6\"/><path d=\"M6 12.5V16a6 3 0 0 0 12 0v-3.5\"/>","academy":"<path d=\"M10 18v-7\"/><path d=\"M11.12 2.198a2 2 0 0 1 1.76.006l7.866 3.847c.476.233.31.949-.22.949H3.474c-.53 0-.695-.716-.22-.949z\"/><path d=\"M14 18v-7\"/><path d=\"M18 18v-7\"/><path d=\"M3 22h18\"/><path d=\"M6 18v-7\"/>","time":"<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M12 6v6l4 2\"/>","location":"<path d=\"M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0\"/><circle cx=\"12\" cy=\"10\" r=\"3\"/>","mapUrl":"<path d=\"M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71\"/><path d=\"M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71\"/>","qrLabel":"<rect width=\"5\" height=\"5\" x=\"3\" y=\"3\" rx=\"1\"/><rect width=\"5\" height=\"5\" x=\"16\" y=\"3\" rx=\"1\"/><rect width=\"5\" height=\"5\" x=\"3\" y=\"16\" rx=\"1\"/><path d=\"M21 16h-3a2 2 0 0 0-2 2v3\"/><path d=\"M21 21v.01\"/><path d=\"M12 7v3a2 2 0 0 1-2 2H7\"/><path d=\"M3 12h.01\"/><path d=\"M12 3h.01\"/><path d=\"M12 16v.01\"/><path d=\"M16 12h1\"/><path d=\"M21 12v.01\"/><path d=\"M12 21v-1\"/>","closingLine1":"<path d=\"M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z\"/>","closingLine2":"<path d=\"M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z\"/>","signature":"<path d=\"M12 20h9\"/><path d=\"M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z\"/>","presentedTo":"<path d=\"M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z\"/><circle cx=\"7.5\" cy=\"7.5\" r=\".5\" fill=\"currentColor\"/>","sealLetter":"<path d=\"M5 22h14\"/><path d=\"M19.27 13.73A2.5 2.5 0 0 0 17.5 13h-11A2.5 2.5 0 0 0 4 15.5V17a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-1.5c0-.66-.26-1.3-.73-1.77Z\"/><path d=\"M14 13V8.5C14 7 15 7 15 5a3 3 0 0 0-3-3c-1.66 0-3 1-3 3s1 2 1 3.5V13\"/>","honorifics":"<path d=\"M3 12h.01\"/><path d=\"M3 18h.01\"/><path d=\"M3 6h.01\"/><path d=\"M8 12h13\"/><path d=\"M8 18h13\"/><path d=\"M8 6h13\"/>","defaultHonorific":"<path d=\"M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z\"/><path d=\"M5 21h14\"/>","fileNamePrefix":"<path d=\"M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z\"/><path d=\"M14 2v4a2 2 0 0 0 2 2h4\"/>"};
+const fieldIcon=k=>FIELD_ICONS[k]?'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">'+FIELD_ICONS[k]+'</svg>':'';
 /* حقول محرر النصوص — key, ar, en, type */
 const FIELD_GROUPS=[
   {ar:'الحفل',en:'Event',f:[['title','عنوان الكارت','Card title'],['greeting','التحية','Greeting'],['bodyLine1','سطر الدعوة الأول','Invitation line 1'],['bodyLine2','سطر الدعوة التاني','Invitation line 2'],['graduate','اسم الخريج','Graduate name'],['academy','الجهة / الكلية','Academy']]},
@@ -36,7 +39,8 @@ const I18N={
  ar:{docTitle:'كروت دعوة VIP — صمّم كارت دعوة فاخر وشاركه على واتساب في ثواني',appTitle:'كروت دعوة VIP',subtitle:'اختار التصميم، اكتب اسم المدعو، وشاركه في ثانية',designs:'التصميمات',
   filterAll:'الكل',filterTop:'الاسم فوق',filterBottom:'الاسم تحت',prev:'السابق',next:'التالي',
   guestSection:'بيانات المدعو',honorLabel:'اللقب',honorPh:'اختار أو اكتب اللقب',showTitles:'عرض الألقاب',honorHint:'اكتب أول حروف اللقب عشان تفلتر القائمة، أو اكتب لقب جديد.',
-  comboEmpty:'مفيش لقب بالاسم ده — «{v}» هيتكتب زي ما هو',actionsLabel:'مشاركة وتنزيل',
+  comboEmpty:'مفيش لقب بالاسم ده — «{v}» هيتكتب زي ما هو',
+  generalLabel:'دعوة عامة للكل',generalHint:'إخفاء اللقب واسم المدعو من الكارت عشان تبعته لأي حد.',generalNote:'الكارت جاهز كدعوة عامة — من غير لقب أو اسم.',generalFile:'عامة',actionsLabel:'مشاركة وتنزيل',
   pickDate:'اختار التاريخ',todayBtn:'النهارده',prevMonth:'الشهر اللي فات',nextMonth:'الشهر الجاي',pastDisabled:'الأيام اللي فاتت مقفولة',
   nameLabel:'اسم المدعو',namePh:'مثال: محمد عبدالرحمن',sizeSection:'المقاس والجودة',width:'العرض',height:'الارتفاع',
   q1:'عادية',q2:'عالية ×2',output:'الصورة النهائية:',fontSection:'حجم الخط',reset:'رجوع للأصل',
@@ -63,7 +67,8 @@ const I18N={
  en:{docTitle:'VIP Invitation Cards — Design a luxury invitation and share it on WhatsApp',appTitle:'VIP Invitation Cards',subtitle:'Pick a design, add the guest name, share in seconds',designs:'Designs',
   filterAll:'All',filterTop:'Name on top',filterBottom:'Name at bottom',prev:'Previous',next:'Next',
   guestSection:'Guest details',honorLabel:'Title',honorPh:'Pick or type a title',showTitles:'Show titles',honorHint:'Type the first letters to filter the list, or write a new title.',
-  comboEmpty:'No matching title — “{v}” will be used as typed',actionsLabel:'Share & download',
+  comboEmpty:'No matching title — “{v}” will be used as typed',
+  generalLabel:'General invitation for everyone',generalHint:'Hide the title and guest name so the card can be sent to anyone.',generalNote:'The card is ready as a general invitation — no title or name.',generalFile:'عامة',actionsLabel:'Share & download',
   pickDate:'Pick the date',todayBtn:'Today',prevMonth:'Previous month',nextMonth:'Next month',pastDisabled:'Past days are disabled',
   nameLabel:'Guest name',namePh:'e.g. محمد عبدالرحمن',sizeSection:'Size & quality',width:'Width',height:'Height',
   q1:'Standard',q2:'HD ×2',output:'Output:',fontSection:'Text size',reset:'Reset',
@@ -96,7 +101,7 @@ const S={
   lang:store.get('lang','ar'),filter:'all',index:0,
   size:store.get('size','feed'),cw:store.get('cw',1200),ch:store.get('ch',1600),
   q:store.get('q',2),fmt:store.get('fmt','jpg'),fs:store.get('fs',100),
-  honor:'',honorTouched:false,name:'',
+  honor:'',honorTouched:false,name:'',general:store.get('general',false),
   base:Object.assign({},DEFAULT_CONTENT),baseSrc:'fallback',C:Object.assign({},DEFAULT_CONTENT),edited:false
 };
 const $=id=>document.getElementById(id);
@@ -198,7 +203,8 @@ function parseDate(str){
 }
 function datePicker(wrap,onPick){
   const btn=wrap.querySelector('.date-btn'),txt=wrap.querySelector('.date-txt'),hid=wrap.querySelector('input[type="hidden"]'),cal=wrap.querySelector('.cal');
-  let view=null,sel=null,focus=null;
+  let view=null,sel=null,focus=null,modal=false,backdrop=null;
+  const small=()=>window.matchMedia&&matchMedia('(max-width:560px)').matches;
   const sameDay=(a,b)=>a&&b&&a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();
   function sync(){sel=parseDate(hid.value);txt.textContent=hid.value||t('pickDate');btn.classList.toggle('empty',!hid.value)}
   function render(){
@@ -215,18 +221,28 @@ function datePicker(wrap,onPick){
       h+='<button type="button" class="cal-day'+(isT?' today':'')+(isSel?' sel':'')+'" data-d="'+d+'" tabindex="'+(isF?0:-1)+'"'+(past?' disabled':'')
         +' aria-pressed="'+isSel+'" aria-label="'+fmtArDate(dt)+'">'+d+'</button>'}
     h+='</div><div class="cal-foot"><small>'+t('pastDisabled')+'</small><button type="button" class="link" data-today>'+t('todayBtn')+'</button></div>';
+    if(modal)h='<div class="cal-top"><b>'+t('pickDate')+'</b><button type="button" class="icon-btn" data-close-cal aria-label="'+t('close')+'"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button></div>'+h;
     cal.innerHTML=h;
   }
   function focusDay(){const b=cal.querySelector('.cal-day[tabindex="0"]');if(b)b.focus()}
   function moveTo(d){const T=today0();if(d<T)d=T;focus=d;if(d.getMonth()!==view.getMonth()||d.getFullYear()!==view.getFullYear())view=new Date(d.getFullYear(),d.getMonth(),1);render();focusDay()}
-  function openCal(){sync();const T=today0();focus=sel&&sel>=T?sel:T;view=new Date(focus.getFullYear(),focus.getMonth(),1);render();cal.hidden=false;btn.setAttribute('aria-expanded','true');wrap.classList.add('open');focusDay()}
-  function closeCal(refocus){if(cal.hidden)return;cal.hidden=true;btn.setAttribute('aria-expanded','false');wrap.classList.remove('open');if(refocus)btn.focus()}
+  function openCal(){sync();const T=today0();focus=sel&&sel>=T?sel:T;view=new Date(focus.getFullYear(),focus.getMonth(),1);
+    modal=small();
+    if(modal){/* بننقل التقويم للـ body عشان يظهر في نص الشاشة بعرض مناسب */
+      backdrop=document.createElement('div');backdrop.className='cal-backdrop';backdrop.addEventListener('click',()=>closeCal(true));
+      document.body.appendChild(backdrop);document.body.appendChild(cal);cal.classList.add('cal-modal');cal.setAttribute('aria-modal','true');document.documentElement.classList.add('locked')}
+    render();cal.hidden=false;btn.setAttribute('aria-expanded','true');wrap.classList.add('open');focusDay()}
+  function closeCal(refocus){if(cal.hidden)return;cal.hidden=true;btn.setAttribute('aria-expanded','false');wrap.classList.remove('open');
+    if(modal){modal=false;cal.classList.remove('cal-modal');cal.removeAttribute('aria-modal');wrap.appendChild(cal);if(backdrop){backdrop.remove();backdrop=null}
+      if($('shareSheet').hidden)document.documentElement.classList.remove('locked')}
+    if(refocus)btn.focus()}
   function choose(d){hid.value=fmtArDate(d);sync();closeCal(true);onPick(hid.value)}
   btn.addEventListener('click',()=>cal.hidden?openCal():closeCal(false));
   cal.addEventListener('click',e=>{const n=e.target.closest('[data-nav]');
     if(n&&!n.disabled){view=new Date(view.getFullYear(),view.getMonth()+(+n.dataset.nav),1);const T=today0();focus=view<T?T:view;render();return}
     const d=e.target.closest('.cal-day');if(d&&!d.disabled){choose(new Date(view.getFullYear(),view.getMonth(),+d.dataset.d));return}
-    if(e.target.closest('[data-today]'))choose(today0())});
+    if(e.target.closest('[data-today]'))choose(today0());
+    if(e.target.closest('[data-close-cal]'))closeCal(true)});
   cal.addEventListener('keydown',e=>{
     if(e.key==='Escape'){e.preventDefault();e.stopPropagation();closeCal(true);return}
     if(!e.target.classList.contains('cal-day'))return;
@@ -239,9 +255,12 @@ function datePicker(wrap,onPick){
     else if(e.key==='PageDown')n=new Date(f.getFullYear(),f.getMonth()+1,f.getDate());
     else if(e.key==='Home')n=today0();
     if(n){e.preventDefault();moveTo(n)}});
-  document.addEventListener('mousedown',e=>{if(!cal.hidden&&!wrap.contains(e.target))closeCal(false)});
-  document.addEventListener('touchstart',e=>{if(!cal.hidden&&!wrap.contains(e.target))closeCal(false)},{passive:true});
-  wrap.addEventListener('focusout',e=>{if(e.relatedTarget&&!wrap.contains(e.relatedTarget))closeCal(false)});
+  const outside=n=>!wrap.contains(n)&&!cal.contains(n)&&n!==backdrop;
+  document.addEventListener('mousedown',e=>{if(!cal.hidden&&!modal&&outside(e.target))closeCal(false)});
+  document.addEventListener('touchstart',e=>{if(!cal.hidden&&!modal&&outside(e.target))closeCal(false)},{passive:true});
+  wrap.addEventListener('focusout',e=>{if(!modal&&e.relatedTarget&&outside(e.relatedTarget))closeCal(false)});
+  cal.addEventListener('focusout',e=>{if(!modal&&e.relatedTarget&&outside(e.relatedTarget))closeCal(false)});
+  window.addEventListener('resize',()=>{if(!cal.hidden&&modal!==small())closeCal(false)});
   return{sync:sync,close:closeCal};
 }
 let edDate=null;
@@ -329,7 +348,12 @@ function onScroll(){cancelAnimationFrame(scrollRaf);scrollRaf=requestAnimationFr
 /* ---------- rendering: كارت واحد في كل مرة — الظاهر فورًا، اللي جنبه وقت فراغ المتصفح، والبعيد لما توصله ---------- */
 const dirty={};let pumping=false,canPaint=false;
 const idle=window.requestIdleCallback?(f=>requestIdleCallback(f,{timeout:400})):(f=>setTimeout(f,32));
-function opts(){return{C:S.C,honor:S.honor,name:S.name,fs:S.fs/100}}
+function guest(){return S.general?'':S.name}
+function opts(){return{C:S.C,honor:S.honor,name:guest(),general:S.general,fs:S.fs/100}}
+function applyGeneral(){
+  $('generalToggle').checked=S.general;$('guestCard').classList.toggle('is-general',S.general);
+  $('guestFields').hidden=S.general;$('generalNote').hidden=!S.general;
+}
 function renderAll(){DESIGNS.forEach(d=>{dirty[d.id]=1});pump()}
 const AHEAD=2;
 function nextDirty(){let best=-1,bd=1e9;list.forEach((d,i)=>{if(dirty[d.id]&&canvases[d.id]){const dd=Math.abs(i-S.index);if(dd<bd){bd=dd;best=i}}});return best<0||bd>AHEAD?null:{i:best,near:bd===0}}
@@ -342,7 +366,7 @@ let timer;function schedule(){clearTimeout(timer);invalidateShare();timer=setTim
 
 /* ---------- export ---------- */
 function safe(s){return String(s||'').replace(/[\\/:*?"<>|]+/g,'').replace(/\s+/g,' ').trim()}
-function fileName(d,fmt){const o=outDims();return safe([S.C.fileNamePrefix||'دعوة',S.name,d.ar,o.w+'x'+o.h].filter(Boolean).join(' - '))+'.'+(fmt||S.fmt)}
+function fileName(d,fmt){const o=outDims();return safe([S.C.fileNamePrefix||'دعوة',S.general?t('generalFile'):S.name,d.ar,o.w+'x'+o.h].filter(Boolean).join(' - '))+'.'+(fmt||S.fmt)}
 function exportBlob(d,fmt){
   fmt=fmt||S.fmt;const o=outDims();const c=document.createElement('canvas');c.width=o.w;c.height=o.h;paint(c,d,opts());
   const type=fmt==='png'?'image/png':'image/jpeg';
@@ -365,7 +389,7 @@ function onZip(){busy($('zipBtn'),async(sp)=>{
   for(let i=0;i<DESIGNS.length;i++){sp.textContent=(i+1)+'/'+DESIGNS.length;const d=DESIGNS[i];const b=await exportBlob(d);
     z.file(String(i+1).padStart(2,'0')+' - '+fileName(d),b);await new Promise(r=>setTimeout(r,0))}
   const o=outDims();const zb=await z.generateAsync({type:'blob',compression:'STORE'});
-  saveBlob(zb,safe([S.C.fileNamePrefix||'دعوة',S.name,DESIGNS.length+' designs',o.w+'x'+o.h].filter(Boolean).join(' - '))+'.zip');toast(t('zipSaved'))})}
+  saveBlob(zb,safe([S.C.fileNamePrefix||'دعوة',S.general?t('generalFile'):S.name,DESIGNS.length+' designs',o.w+'x'+o.h].filter(Boolean).join(' - '))+'.zip');toast(t('zipSaved'))})}
 
 /* ---------- share sheet ---------- */
 const UA=navigator.userAgent||'';
@@ -420,7 +444,7 @@ let lastFocus=null;
 function openSheet(){
   lastFocus=document.activeElement;const sh=$('shareSheet');sh.hidden=false;document.documentElement.classList.add('locked');
   requestAnimationFrame(()=>sh.classList.add('open'));
-  const d=list[S.index];$('sharePvName').textContent=(S.lang==='ar'?d.ar:d.en)+(S.name?' · '+S.name:'');
+  const d=list[S.index];$('sharePvName').textContent=(S.lang==='ar'?d.ar:d.en)+(guest()?' · '+guest():S.general?' · '+t('generalLabel'):'');
   const img=$('sharePreview');img.removeAttribute('src');$('shareStatus').textContent=t('pvPreparing');sh.classList.add('loading');
   const my=shareGen;
   prepareShare().then(r=>{if(my!==shareGen||sh.hidden)return;if(pvUrl)URL.revokeObjectURL(pvUrl);pvUrl=URL.createObjectURL(r.blob);img.src=pvUrl;
@@ -433,7 +457,7 @@ function closeSheet(){const sh=$('shareSheet');if(sh.hidden)return;sh.classList.
 function inviteText(){
   const C=S.C,L=[];const add=v=>{if(v)L.push(v)};
   add(C.title?'*'+C.title+'*':'');
-  if(S.name)add(t('invitedHonor').replace('{h}',S.honor||'').replace('{n}',S.name));
+  if(guest())add(t('invitedHonor').replace('{h}',S.honor||'').replace('{n}',guest()));
   add(C.greeting);add([C.bodyLine1,C.bodyLine2].filter(Boolean).join(' '));
   add([C.graduate?'*'+C.graduate+'*':'',C.academy].filter(Boolean).join(' '));
   L.push('');
@@ -508,7 +532,7 @@ function buildEditor(){
             +'<button type="button" class="date-btn" id="edDateBtn" aria-haspopup="dialog" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg><span class="date-txt"></span><svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>'
             +'<div class="cal" role="dialog" aria-label="'+t('pickDate')+'" hidden></div></div>')}
         else{lb.htmlFor=fieldId(k);
-          fd.insertAdjacentHTML('beforeend','<div class="combo"><input type="text" id="'+fieldId(k)+'" name="'+k+'" dir="auto" autocomplete="off" spellcheck="false" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="'+fieldId(k)+'_list">'
+          fd.insertAdjacentHTML('beforeend','<div class="combo has-ic">'+fieldIcon(k)+'<input type="text" id="'+fieldId(k)+'" name="'+k+'" dir="auto" autocomplete="off" spellcheck="false" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="'+fieldId(k)+'_list">'
             +'<button type="button" class="combo-toggle" tabindex="-1" aria-label="'+t('showTitles')+'"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>'
             +'<ul class="combo-list" id="'+fieldId(k)+'_list" role="listbox" hidden></ul></div>')}
         fs.appendChild(fd);return}
@@ -518,10 +542,11 @@ function buildEditor(){
       if(type==='list'){inp=document.createElement('textarea');inp.rows=4}
       else{inp=document.createElement('input');inp.type=type==='url'?'url':'text';if(type==='url'){inp.dir='ltr';inp.inputMode='url';inp.spellcheck=false}if(type==='short')inp.maxLength=3}
       inp.id=fieldId(k);inp.name=k;if(type!=='url')inp.dir='auto';
-      if(type==='url'){const wrap=document.createElement('div');wrap.className='url-row';wrap.appendChild(inp);
+      const icw=document.createElement('span');icw.className='has-ic'+(type==='list'?' ic-top':'');icw.innerHTML=fieldIcon(k);icw.appendChild(inp);
+      if(type==='url'){const wrap=document.createElement('div');wrap.className='url-row';wrap.appendChild(icw);
         const a=document.createElement('a');a.className='btn mini';a.id='edMapOpen';a.target='_blank';a.rel='noopener';a.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg><span></span>';
         wrap.appendChild(a);lab.appendChild(wrap)}
-      else lab.appendChild(inp);
+      else lab.appendChild(icw);
       fs.appendChild(lab)});
     box.appendChild(fs)});
   edDate=datePicker(document.querySelector('#editorForm .datepick'),()=>markDirty());
@@ -578,7 +603,7 @@ async function init(){
   await loadBase();applyContent();
   $('fs').value=S.fs;$('fsVal').textContent=S.fs+'%';$('cw').value=S.cw;$('ch').value=S.ch;
   const y=$('year');if(y)y.textContent=new Date().getFullYear();
-  buildEditor();applyLang();buildSlider();
+  buildEditor();applyLang();applyGeneral();buildSlider();
   /* الرسم بيستنى الخطوط بحد أقصى 2.5 ثانية عشان الكروت متترسمش بخط غلط */
   Promise.race([fontsP,new Promise(r=>setTimeout(r,2500))]).then(()=>{canPaint=true;renderAll();
     if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>renderAll())});
@@ -592,6 +617,7 @@ async function init(){
   $('prevBtn').addEventListener('click',()=>go(S.index-1));$('nextBtn').addEventListener('click',()=>go(S.index+1));
   combo($('honorInput'),$('honorList'),{options:()=>S.C.honorifics||[],onChange:v=>{S.honorTouched=true;S.honor=v.trim();schedule()}});
   $('guestName').addEventListener('input',e=>{S.name=e.target.value.trim();schedule()});
+  $('generalToggle').addEventListener('change',e=>{S.general=e.target.checked;store.set('general',S.general);applyGeneral();schedule()});
   $('quality').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.q=+b.dataset.q;store.set('q',S.q);invalidateShare();buildSizes()});
   $('format').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.fmt=b.dataset.f;store.set('fmt',S.fmt);invalidateShare();buildSizes()});
   const cust=()=>{S.cw=$('cw').value;S.ch=$('ch').value;store.set('cw',S.cw);store.set('ch',S.ch);clearTimeout(cust.h);cust.h=setTimeout(sizeChanged,300)};

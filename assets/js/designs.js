@@ -171,21 +171,21 @@
 
   /* ---------- layout ---------- */
   // [key, base height, scales with font?]
-  function blocks(d,C){
+  function blocks(d,C,general){
     const top=d.pos==='top';const b=[];
     b.push(['title',d.laurel?200:160,true]);
-    if(top){b.push(['honor',42,true],['name',80,true],['div',46,false]);if(C.greeting)b.push(['greet',44,true])}
+    if(top){if(!general)b.push(['honor',42,true],['name',80,true]);b.push(['div',46,false]);if(C.greeting)b.push(['greet',44,true])}
     if(C.bodyLine1)b.push(['body1',48,true]);if(C.bodyLine2)b.push(['body2',48,true]);
     b.push(['son',(d.son==='bar'||d.son==='barDark')?110:86,true]);
     if(C.academy)b.push(['academy',50,true]);
     b.push(['div',52,false],['details',282,false]);
     if(C.closingLine1)b.push(['close1',46,true]);if(C.closingLine2)b.push(['close2',46,true]);
     if(C.signature)b.push(['sig',66,true]);
-    if(!top)b.push(['plaque',236,false]);
+    if(!top&&!general)b.push(['plaque',236,false]);
     return b;
   }
-  function layout(d,C,fs){
-    const list=blocks(d,C);
+  function layout(d,C,fs,general){
+    const list=blocks(d,C,general);
     const heights=list.map(([,h,t])=>h*(t?fs:1));
     const Hc=heights.reduce((a,b)=>a+b,0);
     const padT=70,padB=d.bg[0]==='split'?96:80, Ha=H-padT-padB;
@@ -201,7 +201,7 @@
   /* ---------- main render (ctx already scaled to logical units) ---------- */
   function render(ctx,d,o){
     W=o.LW;H=o.LH;const C=o.C,fs=o.fs||1,L=d.light;
-    const lay=layout(d,C,fs),s=lay.s;
+    const lay=layout(d,C,fs,o.general),s=lay.s;
     ctx.clearRect(0,0,W,H);drawBg(ctx,d,lay);d.ov.forEach(v=>overlay(ctx,d,v));drawFrame(ctx,d);
     const glow=L?['rgba(255,255,255,.7)',0,1.5]:['rgba(0,0,0,.45)',10,2];
     const goldW=foil(ctx,-500,-200,500,200,d.foil);
