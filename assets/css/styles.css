@@ -126,7 +126,9 @@ button{cursor:pointer}
 @media (prefers-reduced-motion:reduce){#toast{transition:none}}
 
 /* ---------- texts editor ---------- */
-.editor{scroll-margin-top:90px}
+.editor{scroll-margin-top:90px;content-visibility:auto;contain-intrinsic-size:auto 1500px}
+@media (min-width:720px){.editor{contain-intrinsic-size:auto 900px}}
+.footer{content-visibility:auto;contain-intrinsic-size:auto 220px}
 @media (min-width:960px){.editor{grid-column:1 / -1}}
 .editor-head{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:8px 12px;margin-bottom:14px}
 .editor-head>div{flex:1 1 220px;min-width:0}

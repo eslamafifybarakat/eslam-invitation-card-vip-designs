@@ -324,12 +324,13 @@ let scrollRaf=0;
 function onScroll(){cancelAnimationFrame(scrollRaf);scrollRaf=requestAnimationFrame(()=>{const tb=$('track').getBoundingClientRect();const mid=tb.left+tb.width/2;let best=0,bd=1e9;
   slides.forEach((s,k)=>{const r=s.getBoundingClientRect();const dd=Math.abs(r.left+r.width/2-mid);if(dd<bd){bd=dd;best=k}});if(best!==S.index)setIndex(best)})}
 
-/* ---------- rendering: كارت واحد في كل مرة، الأقرب للي ظاهر الأول، والباقي وقت فراغ المتصفح ---------- */
+/* ---------- rendering: كارت واحد في كل مرة — الظاهر فورًا، اللي جنبه وقت فراغ المتصفح، والبعيد لما توصله ---------- */
 const dirty={};let pumping=false,canPaint=false;
 const idle=window.requestIdleCallback?(f=>requestIdleCallback(f,{timeout:400})):(f=>setTimeout(f,32));
 function opts(){return{C:S.C,honor:S.honor,name:S.name,fs:S.fs/100}}
 function renderAll(){DESIGNS.forEach(d=>{dirty[d.id]=1});pump()}
-function nextDirty(){let best=-1,bd=1e9;list.forEach((d,i)=>{if(dirty[d.id]&&canvases[d.id]){const dd=Math.abs(i-S.index);if(dd<bd){bd=dd;best=i}}});return best<0?null:{i:best,near:bd<=1}}
+const AHEAD=2;
+function nextDirty(){let best=-1,bd=1e9;list.forEach((d,i)=>{if(dirty[d.id]&&canvases[d.id]){const dd=Math.abs(i-S.index);if(dd<bd){bd=dd;best=i}}});return best<0||bd>AHEAD?null:{i:best,near:bd===0}}
 function pump(){if(pumping||!canPaint)return;const n=nextDirty();if(!n)return;pumping=true;(n.near?requestAnimationFrame:idle)(tick)}
 function tick(){pumping=false;const n=nextDirty();if(!n)return;
   if(!n.near&&document.hidden){return}
