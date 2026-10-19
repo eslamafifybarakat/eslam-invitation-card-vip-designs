@@ -48,14 +48,27 @@
   function rrect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
   function diamond(ctx,x,y,s){ctx.beginPath();ctx.moveTo(x,y-s);ctx.lineTo(x+s,y);ctx.lineTo(x,y+s);ctx.lineTo(x-s,y);ctx.closePath();ctx.fill()}
   function star8(ctx,cx,cy,r,k){ctx.beginPath();for(let i=0;i<16;i++){const a=i*Math.PI/8-Math.PI/2;const rr=i%2?r*(k||0.62):r;ctx.lineTo(cx+rr*Math.cos(a),cy+rr*Math.sin(a))}ctx.closePath()}
-  let NOISE=null;
-  function noise(){if(NOISE)return NOISE;const c=document.createElement('canvas');c.width=c.height=240;const x=c.getContext('2d');const im=x.createImageData(240,240);const r=rng(99);for(let i=0;i<im.data.length;i+=4){const v=r()*255;im.data[i]=im.data[i+1]=im.data[i+2]=v;im.data[i+3]=255}x.putImageData(im,0,0);NOISE=c;return c}
+  /* ملمس الحبيبات: بيتولد صفوف صفوف (نفس النتيجة بالظبط) عشان التسخين يقسمه على كذا مهمة صغيرة */
+  let NOISE=null,NOISE_X=null,NOISE_R=null,NOISE_ROWS=0;
+  function noiseRows(n){
+    /* willReadFrequently = كانفاس على المعالج، مبيستناش تجهيز كارت الشاشة */
+    if(!NOISE){NOISE=document.createElement('canvas');NOISE.width=NOISE.height=240;NOISE_X=NOISE.getContext('2d',{willReadFrequently:true})||NOISE.getContext('2d');NOISE_R=rng(99)}
+    const end=Math.min(240,NOISE_ROWS+n);if(end<=NOISE_ROWS)return;
+    const im=NOISE_X.createImageData(240,end-NOISE_ROWS),r=NOISE_R;
+    for(let i=0;i<im.data.length;i+=4){const v=r()*255;im.data[i]=im.data[i+1]=im.data[i+2]=v;im.data[i+3]=255}
+    NOISE_X.putImageData(im,0,NOISE_ROWS);NOISE_ROWS=end;
+  }
+  function noise(){noiseRows(240);return NOISE}
 
   function qrMatrix(url){
     if(QR&&QR_URL===url)return QR;
     QR_URL=url;QR=null;
+    /* الباركود بيتحفظ على الجهاز، فالزيارة الجاية متحسبهوش تاني */
+    const key='vipcards:qr:'+url;
+    try{const c=url&&localStorage.getItem(key);if(c){QR=JSON.parse(c);return QR}}catch(_){}
     if(!url||typeof global.qrcode!=='function')return null;
     try{const q=global.qrcode(0,'M');q.addData(url);q.make();const n=q.getModuleCount();QR=[];for(let r=0;r<n;r++){let row='';for(let c=0;c<n;c++)row+=q.isDark(r,c)?'1':'0';QR.push(row)}}catch(e){QR=null}
+    if(QR)try{localStorage.setItem(key,JSON.stringify(QR))}catch(_){}
     return QR;
   }
 
@@ -171,6 +184,7 @@
 
   /* ---------- layout ---------- */
   // [key, base height, scales with font?]
+  function sigLines(C){return String(C.signature||'').split('\n').map(x=>x.trim()).filter(Boolean)}
   function blocks(d,C,general,pos){
     const top=pos==='top';const b=[];
     b.push(['title',d.laurel?200:160,true]);
@@ -180,7 +194,8 @@
     if(C.academy)b.push(['academy',50,true]);
     b.push(['div',52,false],['details',282,false]);
     if(C.closingLine1)b.push(['close1',46,true]);if(C.closingLine2)b.push(['close2',46,true]);
-    if(C.signature)b.push(['sig',66,true]);
+    /* التوقيع ممكن يبقى كذا سطر — كل سطر زيادة بياخد 50 */
+    if(C.signature)b.push(['sig',66+50*(sigLines(C).length-1),true]);
     if(!top&&!general)b.push(['plaque',236,false]);
     return b;
   }
@@ -239,7 +254,7 @@
         txt(ctx,T('location'),tx,rows[2],d.text,400,30*fs,F_BODY,480,'right');break}
       case 'close1':txt(ctx,T('closingLine1'),0,0,accent,400,32*fs,F_BODY,800);break;
       case 'close2':txt(ctx,T('closingLine2'),0,0,accent,400,32*fs,F_BODY,800);break;
-      case 'sig':txt(ctx,T('signature'),0,0,d.strong,700,36*fs,F_BODY,780);break;
+      case 'sig':{const ls=sigLines(C),lh=50*fs;ls.forEach((l,i)=>txt(ctx,l,0,(i-(ls.length-1)/2)*lh,d.strong,700,36*fs,F_BODY,780));break}
       case 'plaque':{const pw=780,ph=210;
         ctx.save();ctx.fillStyle=L?'rgba(140,105,40,0.07)':'rgba(255,240,210,0.06)';rrect(ctx,-pw/2,-ph/2,pw,ph,18);ctx.fill();
         ctx.strokeStyle=goldW;ctx.lineWidth=2;rrect(ctx,-pw/2,-ph/2,pw,ph,18);ctx.stroke();ctx.lineWidth=1;rrect(ctx,-pw/2+10,-ph/2+10,pw-20,ph-20,12);ctx.stroke();ctx.restore();
@@ -263,5 +278,14 @@
     ctx.setTransform(1,0,0,1,0,0);
   }
 
-  global.VIPCards={DESIGNS,paint,qrMatrix};
+  /* تسخين قبل أول رسم: كل خطوة مهمة صغيرة لوحدها عشان الصفحة متهنجش (الباركود، الملمس، كل وزن خط) */
+  function warmSteps(C){
+    const wc=document.createElement('canvas').getContext('2d');wc.direction='rtl';
+    const sample=[C.title,C.greeting,C.bodyLine1,C.graduate,C.date,C.location,C.signature,'سيادة / 0123456789'].filter(Boolean).join(' ');
+    const shape=(w,s,f,t)=>()=>{wc.font=font(w,s,f);wc.measureText(t)};
+    const grain=[0,1,2,3,4,5].map(()=>()=>noiseRows(40));
+    return [()=>qrMatrix(C.mapUrl)].concat(grain,[shape(300,30,F_BODY,sample),shape(400,34,F_BODY,sample),shape(600,32,F_BODY,sample),shape(700,48,F_BODY,sample),shape(700,120,F_TITLE,C.title||'دعوة')]);
+  }
+
+  global.VIPCards={DESIGNS,paint,qrMatrix,warmSteps};
 })(window);

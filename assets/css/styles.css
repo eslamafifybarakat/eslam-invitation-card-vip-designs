@@ -135,6 +135,8 @@ button{cursor:pointer}
 .editor{scroll-margin-top:90px;content-visibility:auto;contain-intrinsic-size:auto 1500px}
 @media (min-width:720px){.editor{contain-intrinsic-size:auto 900px}}
 .footer{content-visibility:auto;contain-intrinsic-size:auto 220px}
+/* على الموبايل البانل والأزرار تحت السلايدر، فالمتصفح بيأجل حسابهم لحد ما يقربوا من الشاشة */
+@media (max-width:959px){.panel>.card{content-visibility:auto;contain-intrinsic-size:auto 420px}.actionbar{content-visibility:auto;contain-intrinsic-size:auto 78px}}
 @media (min-width:960px){.editor{grid-column:1 / -1}}
 .editor-head{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:8px 12px;margin-bottom:14px}
 .editor-head>div{flex:1 1 220px;min-width:0}
@@ -149,6 +151,7 @@ button{cursor:pointer}
 .ed-group .field:last-child{margin-bottom:0}
 .field input,.field textarea{background:#fff}
 .field textarea{height:auto;min-height:110px;padding:12px 14px;line-height:1.7;resize:vertical}
+.field textarea.multi{min-height:80px}
 .field input[aria-invalid="true"]{border-color:#c2410c;box-shadow:0 0 0 3px rgba(194,65,12,.15)}
 .url-row{display:flex;gap:8px}
 .url-row input{flex:1;min-width:0;text-align:left}

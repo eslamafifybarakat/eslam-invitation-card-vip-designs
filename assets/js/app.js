@@ -22,7 +22,7 @@ const fieldIcon=k=>FIELD_ICONS[k]?'<svg class="ic" viewBox="0 0 24 24" aria-hidd
 const FIELD_GROUPS=[
   {ar:'الحفل',en:'Event',f:[['title','عنوان الكارت','Card title'],['greeting','التحية','Greeting'],['bodyLine1','سطر الدعوة الأول','Invitation line 1'],['bodyLine2','سطر الدعوة التاني','Invitation line 2'],['graduate','اسم الخريج','Graduate name'],['academy','الجهة / الكلية','Academy']]},
   {ar:'الموعد والمكان',en:'Date & place',f:[['date','التاريخ','Date','date'],['time','الوقت','Time'],['location','المكان','Location'],['mapUrl','لينك اللوكيشن (الباركود)','Location link (QR)','url'],['qrLabel','النص تحت الباركود','Text under QR']]},
-  {ar:'الختام والتوقيع',en:'Closing & signature',f:[['closingLine1','سطر الختام الأول','Closing line 1'],['closingLine2','سطر الختام التاني','Closing line 2'],['signature','التوقيع','Signature'],['presentedTo','عنوان خانة المدعو','Guest plaque label'],['sealLetter','حرف الختم','Seal letter','short']]},
+  {ar:'الختام والتوقيع',en:'Closing & signature',f:[['closingLine1','سطر الختام الأول','Closing line 1'],['closingLine2','سطر الختام التاني','Closing line 2'],['signature','التوقيع (ممكن أكتر من سطر)','Signature (multi-line)','multi'],['presentedTo','عنوان خانة المدعو','Guest plaque label'],['sealLetter','حرف الختم','Seal letter','short']]},
   {ar:'الألقاب والملف',en:'Titles & file',f:[['honorifics','الألقاب (كل لقب في سطر)','Titles (one per line)','list'],['defaultHonorific','اللقب الافتراضي','Default title','combo'],['fileNamePrefix','بداية اسم الملف','File name prefix']]}
 ];
 
@@ -292,7 +292,7 @@ function previewDims(){
   /* حجم الكانفاس = حجم عرضه الفعلي × كثافة الشاشة (بحد أقصى ×2) — أسرع بكتير من رسم صورة كبيرة */
   const {w,h}=curSize();const ar=w/h;
   const c=slides[0]&&slides[0].firstChild;let cssW=c&&c.clientWidth;
-  if(!cssW){const vw=document.documentElement.clientWidth,vh=window.innerHeight;cssW=Math.min(vw*0.8,Math.min(vh*0.62,760)*ar,900)}
+  if(!cssW){const vw=window.innerWidth,vh=window.innerHeight;/* innerWidth مش بيجبر المتصفح يعيد الحساب */cssW=Math.min(vw*0.8,Math.min(vh*0.62,760)*ar,900)}
   const long=Math.max(cssW,cssW/ar)*DPR();const k=Math.min(1500,Math.max(480,long))/Math.max(w,h);
   return{w:Math.round(w*k),h:Math.round(h*k)};
 }
@@ -348,6 +348,9 @@ function onScroll(){cancelAnimationFrame(scrollRaf);scrollRaf=requestAnimationFr
 /* ---------- rendering: كارت واحد في كل مرة — الظاهر فورًا، اللي جنبه وقت فراغ المتصفح، والبعيد لما توصله ---------- */
 const dirty={};let pumping=false,canPaint=false;
 const idle=window.requestIdleCallback?(f=>requestIdleCallback(f,{timeout:400})):(f=>setTimeout(f,32));
+/* خطوات التسخين بتتنفذ واحدة واحدة مع فواصل، عشان مفيش مهمة طويلة تعطل الصفحة */
+function warmUp(){const steps=window.VIPCards.warmSteps?window.VIPCards.warmSteps(S.C):[];let i=0;
+  return new Promise(res=>{const next=()=>{if(i>=steps.length){res();return}try{steps[i++]()}catch(_){}setTimeout(next,0)};next()})}
 function guest(){return S.general?'':S.name}
 function opts(){return{C:S.C,honor:S.honor,name:guest(),general:S.general,pos:S.pos,fs:S.fs/100}}
 function applyPos(){document.querySelectorAll('#posSeg button').forEach(b=>b.setAttribute('aria-checked',String(b.dataset.pos===S.pos)))}
@@ -541,9 +544,10 @@ function buildEditor(){
       const sp=document.createElement('span');sp.dataset.k=k;lab.appendChild(sp);
       let inp;
       if(type==='list'){inp=document.createElement('textarea');inp.rows=4}
+      else if(type==='multi'){inp=document.createElement('textarea');inp.rows=2;inp.className='multi'}
       else{inp=document.createElement('input');inp.type=type==='url'?'url':'text';if(type==='url'){inp.dir='ltr';inp.inputMode='url';inp.spellcheck=false}if(type==='short')inp.maxLength=3}
       inp.id=fieldId(k);inp.name=k;if(type!=='url')inp.dir='auto';
-      const icw=document.createElement('span');icw.className='has-ic'+(type==='list'?' ic-top':'');icw.innerHTML=fieldIcon(k);icw.appendChild(inp);
+      const icw=document.createElement('span');icw.className='has-ic'+(type==='list'||type==='multi'?' ic-top':'');icw.innerHTML=fieldIcon(k);icw.appendChild(inp);
       if(type==='url'){const wrap=document.createElement('div');wrap.className='url-row';wrap.appendChild(icw);
         const a=document.createElement('a');a.className='btn mini';a.id='edMapOpen';a.target='_blank';a.rel='noopener';a.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg><span></span>';
         wrap.appendChild(a);lab.appendChild(wrap)}
@@ -569,6 +573,8 @@ function readEditor(){
   const o={};
   FIELD_GROUPS.forEach(g=>g.f.forEach(f=>{const el=$(fieldId(f[0]));if(!el)return;let v=el.value;
     if(f[3]==='list')o[f[0]]=v.split(/[\n,،]+/).map(x=>x.trim()).filter(Boolean);
+    /* multi: نفس التنضيف بس كل سطر لوحده عشان فواصل الأسطر تفضل */
+    else if(f[3]==='multi')o[f[0]]=v.split('\n').map(x=>x.replace(/\s+/g,' ').trim()).filter(Boolean).join('\n');
     else o[f[0]]=v.replace(/\s+/g,' ').trim()}));
   if(o.mapUrl&&!/^[a-z][a-z0-9+.-]*:/i.test(o.mapUrl))o.mapUrl='https://'+o.mapUrl;
   return o;
@@ -604,9 +610,11 @@ async function init(){
   await loadBase();applyContent();
   $('fs').value=S.fs;$('fsVal').textContent=S.fs+'%';$('cw').value=S.cw;$('ch').value=S.ch;
   const y=$('year');if(y)y.textContent=new Date().getFullYear();
-  buildEditor();applyLang();applyGeneral();applyPos();buildSlider();
+  applyLang();applyGeneral();applyPos();buildSlider();
+  /* محرر النصوص تحت الصفحة، فبيتبني في مهمة لوحده بعد أول رسم */
+  setTimeout(()=>{buildEditor();buildEditorLabels();textsStatus()},0);
   /* الرسم بيستنى الخطوط بحد أقصى 2.5 ثانية عشان الكروت متترسمش بخط غلط */
-  Promise.race([fontsP,new Promise(r=>setTimeout(r,2500))]).then(()=>{canPaint=true;renderAll();
+  Promise.race([fontsP,new Promise(r=>setTimeout(r,2500))]).then(()=>warmUp()).then(()=>{canPaint=true;renderAll();
     if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>renderAll())});
 
   $('langBtn').addEventListener('click',()=>{S.lang=S.lang==='ar'?'en':'ar';store.set('lang',S.lang);applyLang();requestAnimationFrame(()=>{padTrack();go(S.index,false)})});
