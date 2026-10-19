@@ -125,7 +125,7 @@ function textsStatus(){$('textsStatus').textContent=S.edited?t('textsEdited'):S.
 /* ---------- i18n ---------- */
 function applyLang(){
   const ar=S.lang==='ar';document.documentElement.lang=S.lang;document.documentElement.dir=ar?'rtl':'ltr';
-  document.title=t('docTitle');const lb=$('langBtn');lb.textContent=ar?'EN':'ع';lb.setAttribute('aria-label',ar?'EN — English':'ع — العربية');lb.lang=ar?'en':'ar';
+  document.title=t('docTitle');const lb=$('langBtn'),lt=$('langTxt');lt.textContent=ar?'EN':'ع';lt.lang=ar?'en':'ar';lb.setAttribute('aria-label',ar?'EN — English':'ع — العربية');
   document.querySelectorAll('[data-i18n]').forEach(e=>{const v=t(e.dataset.i18n);if(e.textContent!==v)e.textContent=v});
   document.querySelectorAll('[data-i18n-ph]').forEach(e=>e.placeholder=t(e.dataset.i18nPh));
   document.querySelectorAll('[data-i18n-aria]').forEach(e=>e.setAttribute('aria-label',t(e.dataset.i18nAria)));
@@ -205,9 +205,9 @@ function datePicker(wrap,onPick){
     const T=today0(),ar=S.lang==='ar',start=ar?6:0;
     const y=view.getFullYear(),mo=view.getMonth();
     const canPrev=y>T.getFullYear()||(y===T.getFullYear()&&mo>T.getMonth());
-    let h='<div class="cal-head"><button type="button" class="cal-nav" data-nav="-1" aria-label="'+t('prevMonth')+'"'+(canPrev?'':' disabled')+'><svg viewBox="0 0 24 24" aria-hidden="true"><path d="'+(ar?'M9 6l6 6-6 6':'M15 6l-6 6 6 6')+'"/></svg></button>'
+    let h='<div class="cal-head"><button type="button" class="cal-nav" data-nav="-1" aria-label="'+t('prevMonth')+'"'+(canPrev?'':' disabled')+'><svg viewBox="0 0 24 24" aria-hidden="true"><path d="'+(ar?'m9 18 6-6-6-6':'m15 18-6-6 6-6')+'"/></svg></button>'
       +'<b aria-live="polite">'+(ar?AR_MONTHS:EN_MONTHS)[mo]+' '+y+'</b>'
-      +'<button type="button" class="cal-nav" data-nav="1" aria-label="'+t('nextMonth')+'"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="'+(ar?'M15 6l-6 6 6 6':'M9 6l6 6-6 6')+'"/></svg></button></div><div class="cal-grid" role="grid">';
+      +'<button type="button" class="cal-nav" data-nav="1" aria-label="'+t('nextMonth')+'"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="'+(ar?'m15 18-6-6 6-6':'m9 18 6-6-6-6')+'"/></svg></button></div><div class="cal-grid" role="grid">';
     for(let i=0;i<7;i++)h+='<span class="cal-wd" aria-hidden="true">'+WD[ar?'ar':'en'][(start+i)%7]+'</span>';
     const first=new Date(y,mo,1),lead=(first.getDay()-start+7)%7,dim=new Date(y,mo+1,0).getDate();
     for(let i=0;i<lead;i++)h+='<span></span>';
@@ -370,21 +370,23 @@ function onZip(){busy($('zipBtn'),async(sp)=>{
 /* ---------- share sheet ---------- */
 const UA=navigator.userAgent||'';
 const isMobile=/Android|iPhone|iPad|iPod|Mobile|Silk|Kindle|Opera Mini/i.test(UA)||(navigator.maxTouchPoints>1&&/Macintosh/.test(UA));
+/* أيقونات حديثة بنمط Lucide (خط 2px بحواف دائرية) + شعارات التطبيقات الرسمية */
 const ICONS={
-  all:'<path d="M12 3v12M7 8l5-5 5 5M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/>',
-  wa:'<path d="M4 20l1.3-4A8 8 0 1 1 8.4 19z"/><path d="M9.2 8.6c.2-.4.6-.5.9-.4l.8 1.7c.1.3 0 .5-.2.7l-.5.5c.6 1.2 1.6 2.2 2.8 2.8l.5-.5c.2-.2.5-.3.7-.2l1.7.8c.2.3 0 .7-.4 1-1.6 1.2-6.6-2.6-6.3-6.4z" fill="currentColor" stroke="none"/>',
-  copy:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>',
-  dl:'<path d="M12 3v12M7 10l5 5 5-5M5 19h14"/>',
-  tg:'<path d="M21 4L3 11l6 2 2 6 3-4 5 4z"/><path d="M9 13l8-6-6 8"/>',
-  fb:'<path d="M14 21v-7h3l.5-3H14V9c0-1 .4-1.6 1.6-1.6H17.6V4.6c-.4 0-1.6-.2-2.8-.2-2.6 0-4 1.5-4 4.2V11H8v3h2.8v7"/>',
-  x:'<path d="M4 4l16 16M20 4L4 20" stroke-width="2.4"/>',
-  mail:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>',
-  sms:'<path d="M4 5h16v11H9l-5 4z"/><path d="M8 10h8M8 13h5"/>',
-  more:'<circle cx="6" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="18" cy="12" r="1.6" fill="currentColor"/>',
-  text:'<path d="M5 6h14M5 11h14M5 16h9"/>'
+  all:'<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.59 13.51 6.83 3.98M15.41 6.51l-6.82 3.98"/>',
+  copy:'<rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>',
+  dl:'<path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/>',
+  mail:'<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',
+  sms:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M13 8H7"/><path d="M17 12H7"/>',
+  more:'<circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>',
+  text:'<rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/>',
+  wa:'<path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/>',
+  tg:'<path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>',
+  fb:'<path d="M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 .955.042 1.468.103a8.68 8.68 0 0 1 1.141.195v3.325a8.623 8.623 0 0 0-.653-.036 26.805 26.805 0 0 0-.733-.009c-.707 0-1.259.096-1.675.309a1.686 1.686 0 0 0-.679.622c-.258.42-.374.995-.374 1.752v1.297h3.919l-.386 2.103-.287 1.564h-3.246v8.245C19.396 23.238 24 18.179 24 12.044c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.628 3.874 10.35 9.101 11.647Z"/>',
+  x:'<path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/>'
 };
-const IMG_ACTIONS=[['all','sAll','all','#7d5e22'],['waImg','sWaImg','wa','#25d366'],['copyImg','sCopyImg','copy','#475569'],['download','sDownload','dl','#9a7630']];
-const TEXT_ACTIONS=[['wa','sWa','wa','#25d366'],['tg','sTg','tg','#229ed9'],['fb','sFb','fb','#1877f2'],['x','sX','x','#111111'],['mail','sMail','mail','#ea4335'],['sms','sSms','sms','#0ea5e9'],['moreText','sMoreText','more','#6d28d9'],['copyText','sCopyText','text','#475569']];
+const BRAND={wa:1,tg:1,fb:1,x:1};
+const IMG_ACTIONS=[['all','sAll','all','linear-gradient(135deg,#7d5e22,#b08b3a)'],['waImg','sWaImg','wa','#25d366'],['copyImg','sCopyImg','copy','#475569'],['download','sDownload','dl','linear-gradient(135deg,#8c6a28,#c9a554)']];
+const TEXT_ACTIONS=[['wa','sWa','wa','#25d366'],['tg','sTg','tg','#229ed9'],['fb','sFb','fb','#1877f2'],['x','sX','x','#000000'],['mail','sMail','mail','#ea4335'],['sms','sSms','sms','#0ea5e9'],['moreText','sMoreText','more','#6d28d9'],['copyText','sCopyText','text','#475569']];
 function canShareFiles(){try{if(!navigator.canShare||!navigator.share)return false;const f=new File([new Blob(['x'],{type:'image/png'})],'x.png',{type:'image/png'});return navigator.canShare({files:[f]})}catch(_){return false}}
 function canCopyImage(){return!!(navigator.clipboard&&navigator.clipboard.write&&window.ClipboardItem&&window.isSecureContext)}
 function buildShareGrids(){
@@ -393,7 +395,7 @@ function buildShareGrids(){
     if(a[0]==='moreText'&&!navigator.share)return;
     if(a[0]==='sms'&&!isMobile)return;
     const b=document.createElement('button');b.type='button';b.className='share-btn';b.dataset.act=a[0];
-    b.innerHTML='<i style="background:'+a[3]+'"><svg viewBox="0 0 24 24" aria-hidden="true">'+ICONS[a[2]]+'</svg></i><span></span>';
+    b.innerHTML='<i style="background:'+a[3]+'"><svg'+(BRAND[a[2]]?' class="brand"':'')+' viewBox="0 0 24 24" aria-hidden="true">'+ICONS[a[2]]+'</svg></i><span></span>';
     b.querySelector('span').textContent=t(a[1]);box.appendChild(b)})};
   mk($('shareImageGrid'),IMG_ACTIONS);mk($('shareTextGrid'),TEXT_ACTIONS);
 }
@@ -503,11 +505,11 @@ function buildEditor(){
         const fd=document.createElement('div');fd.className='field';const lb=document.createElement('label');lb.dataset.k=k;fd.appendChild(lb);
         if(type==='date'){lb.htmlFor='edDateBtn';
           fd.insertAdjacentHTML('beforeend','<div class="datepick"><input type="hidden" id="'+fieldId(k)+'" name="'+k+'">'
-            +'<button type="button" class="date-btn" id="edDateBtn" aria-haspopup="dialog" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span class="date-txt"></span><svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>'
+            +'<button type="button" class="date-btn" id="edDateBtn" aria-haspopup="dialog" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg><span class="date-txt"></span><svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>'
             +'<div class="cal" role="dialog" aria-label="'+t('pickDate')+'" hidden></div></div>')}
         else{lb.htmlFor=fieldId(k);
           fd.insertAdjacentHTML('beforeend','<div class="combo"><input type="text" id="'+fieldId(k)+'" name="'+k+'" dir="auto" autocomplete="off" spellcheck="false" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="'+fieldId(k)+'_list">'
-            +'<button type="button" class="combo-toggle" tabindex="-1" aria-label="'+t('showTitles')+'"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>'
+            +'<button type="button" class="combo-toggle" tabindex="-1" aria-label="'+t('showTitles')+'"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>'
             +'<ul class="combo-list" id="'+fieldId(k)+'_list" role="listbox" hidden></ul></div>')}
         fs.appendChild(fd);return}
       const lab=document.createElement('label');lab.className='field'+(type==='list'?' wide':'');lab.htmlFor=fieldId(k);
@@ -517,7 +519,7 @@ function buildEditor(){
       else{inp=document.createElement('input');inp.type=type==='url'?'url':'text';if(type==='url'){inp.dir='ltr';inp.inputMode='url';inp.spellcheck=false}if(type==='short')inp.maxLength=3}
       inp.id=fieldId(k);inp.name=k;if(type!=='url')inp.dir='auto';
       if(type==='url'){const wrap=document.createElement('div');wrap.className='url-row';wrap.appendChild(inp);
-        const a=document.createElement('a');a.className='btn mini';a.id='edMapOpen';a.target='_blank';a.rel='noopener';a.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg><span></span>';
+        const a=document.createElement('a');a.className='btn mini';a.id='edMapOpen';a.target='_blank';a.rel='noopener';a.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg><span></span>';
         wrap.appendChild(a);lab.appendChild(wrap)}
       else lab.appendChild(inp);
       fs.appendChild(lab)});

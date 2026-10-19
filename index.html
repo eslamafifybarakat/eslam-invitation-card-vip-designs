@@ -60,7 +60,7 @@ if(a)document.documentElement.style.setProperty('--ar',a.toFixed(4))}catch(e){}<
       <p data-i18n="subtitle">اختار التصميم، اكتب اسم المدعو، وشاركه في ثانية</p>
     </div>
   </div>
-  <button type="button" class="lang" id="langBtn" aria-label="EN — English" lang="en">EN</button>
+  <button type="button" class="lang" id="langBtn" aria-label="EN — English"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg><span id="langTxt" lang="en">EN</span></button>
 </header>
 
 <main class="layout">
@@ -73,8 +73,8 @@ if(a)document.documentElement.style.setProperty('--ar',a.toFixed(4))}catch(e){}<
     </div>
     <div class="slider">
       <div class="track" id="track" tabindex="0" aria-roledescription="carousel" aria-label="التصميمات"></div>
-      <button type="button" class="nav prev" id="prevBtn" data-i18n-aria="prev" aria-label="السابق"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
-      <button type="button" class="nav next" id="nextBtn" data-i18n-aria="next" aria-label="التالي"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <button type="button" class="nav prev" id="prevBtn" data-i18n-aria="prev" aria-label="السابق"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
+      <button type="button" class="nav next" id="nextBtn" data-i18n-aria="next" aria-label="التالي"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
     </div>
     <div class="now">
       <strong id="designName"></strong>
@@ -90,7 +90,7 @@ if(a)document.documentElement.style.setProperty('--ar',a.toFixed(4))}catch(e){}<
         <label for="honorInput" data-i18n="honorLabel">اللقب</label>
         <div class="combo">
           <input id="honorInput" type="text" dir="rtl" autocomplete="off" spellcheck="false" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="honorList" data-i18n-ph="honorPh" placeholder="اختار أو اكتب اللقب">
-          <button type="button" class="combo-toggle" tabindex="-1" data-i18n-aria="showTitles" aria-label="عرض الألقاب"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+          <button type="button" class="combo-toggle" tabindex="-1" data-i18n-aria="showTitles" aria-label="عرض الألقاب"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
           <ul class="combo-list" id="honorList" role="listbox" hidden></ul>
         </div>
         <small class="field-hint" data-i18n="honorHint">اكتب أول حروف اللقب عشان تفلتر القائمة، أو اكتب لقب جديد.</small>
@@ -102,7 +102,7 @@ if(a)document.documentElement.style.setProperty('--ar',a.toFixed(4))}catch(e){}<
     </div>
 
     <details class="card acc" open>
-      <summary><span data-i18n="sizeSection">المقاس والجودة</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary>
+      <summary><span data-i18n="sizeSection">المقاس والجودة</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
       <div class="acc-body">
         <div class="sizes" id="sizes" role="radiogroup"></div>
         <div class="custom" id="customWrap" hidden>
@@ -125,7 +125,7 @@ if(a)document.documentElement.style.setProperty('--ar',a.toFixed(4))}catch(e){}<
     </details>
 
     <details class="card acc">
-      <summary><span data-i18n="fontSection">حجم الخط</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary>
+      <summary><span data-i18n="fontSection">حجم الخط</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
       <div class="acc-body">
         <div class="range">
           <span class="a-sm">أ</span>
@@ -141,9 +141,9 @@ if(a)document.documentElement.style.setProperty('--ar',a.toFixed(4))}catch(e){}<
 
   <nav class="actionbar" aria-label="actions" data-i18n-aria="actionsLabel">
   <div class="actions">
-    <button type="button" class="btn primary" id="shareBtn" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg><span data-i18n="share">مشاركة</span></button>
-    <button type="button" class="btn" id="dlBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 19h14"/></svg><span data-i18n="download">تنزيل</span></button>
-    <button type="button" class="btn ghost" id="zipBtn" data-i18n-aria="zip" aria-label="الكل ZIP"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zM4 7l2-4h12l2 4M10 11h4"/></svg><span data-i18n="zip">الكل ZIP</span></button>
+    <button type="button" class="btn primary" id="shareBtn" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.59 13.51 6.83 3.98M15.41 6.51l-6.82 3.98"/></svg><span data-i18n="share">مشاركة</span></button>
+    <button type="button" class="btn" id="dlBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg><span data-i18n="download">تنزيل</span></button>
+    <button type="button" class="btn ghost" id="zipBtn" data-i18n-aria="zip" aria-label="الكل ZIP"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/><path d="M12 10v6"/><path d="m15 13-3 3-3-3"/></svg><span data-i18n="zip">الكل ZIP</span></button>
   </div>
 </nav>
 
@@ -158,8 +158,8 @@ if(a)document.documentElement.style.setProperty('--ar',a.toFixed(4))}catch(e){}<
     <form id="editorForm" novalidate autocomplete="off">
       <div class="ed-groups" id="edGroups"></div>
       <div class="ed-actions">
-        <button type="submit" class="btn primary" id="edSave"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg><span data-i18n="save">حفظ وتطبيق</span></button>
-        <button type="button" class="btn" id="edReset"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4v6h6M4.5 15a8 8 0 1 0 1.9-8.3L4 10"/></svg><span data-i18n="resetTexts">رجوع للنصوص الأصلية</span></button>
+        <button type="submit" class="btn primary" id="edSave"><span data-i18n="save">حفظ وتطبيق</span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></button>
+        <button type="button" class="btn" id="edReset"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg><span data-i18n="resetTexts">رجوع للنصوص الأصلية</span></button>
       </div>
       <p class="hint" id="textsStatus"></p>
       <div class="ed-more">
@@ -185,7 +185,7 @@ if(a)document.documentElement.style.setProperty('--ar',a.toFixed(4))}catch(e){}<
     <div class="sheet-grip" aria-hidden="true"></div>
     <div class="sheet-head">
       <h2 id="shareTitle" data-i18n="shareTitle">مشاركة الكارت</h2>
-      <button type="button" class="icon-btn" data-close data-i18n-aria="close" aria-label="إغلاق"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      <button type="button" class="icon-btn" data-close data-i18n-aria="close" aria-label="إغلاق"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
     </div>
     <div class="sheet-body">
       <div class="sheet-preview">
