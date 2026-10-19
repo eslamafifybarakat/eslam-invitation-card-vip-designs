@@ -125,7 +125,7 @@ function textsStatus(){$('textsStatus').textContent=S.edited?t('textsEdited'):S.
 /* ---------- i18n ---------- */
 function applyLang(){
   const ar=S.lang==='ar';document.documentElement.lang=S.lang;document.documentElement.dir=ar?'rtl':'ltr';
-  document.title=t('docTitle');$('langBtn').textContent=ar?'EN':'ع';
+  document.title=t('docTitle');const lb=$('langBtn');lb.textContent=ar?'EN':'ع';lb.setAttribute('aria-label',ar?'EN — English':'ع — العربية');lb.lang=ar?'en':'ar';
   document.querySelectorAll('[data-i18n]').forEach(e=>e.textContent=t(e.dataset.i18n));
   document.querySelectorAll('[data-i18n-ph]').forEach(e=>e.placeholder=t(e.dataset.i18nPh));
   document.querySelectorAll('[data-i18n-aria]').forEach(e=>e.setAttribute('aria-label',t(e.dataset.i18nAria)));
@@ -325,12 +325,12 @@ function onScroll(){cancelAnimationFrame(scrollRaf);scrollRaf=requestAnimationFr
   slides.forEach((s,k)=>{const r=s.getBoundingClientRect();const dd=Math.abs(r.left+r.width/2-mid);if(dd<bd){bd=dd;best=k}});if(best!==S.index)setIndex(best)})}
 
 /* ---------- rendering: كارت واحد في كل مرة، الأقرب للي ظاهر الأول، والباقي وقت فراغ المتصفح ---------- */
-const dirty={};let pumping=false;
+const dirty={};let pumping=false,canPaint=false;
 const idle=window.requestIdleCallback?(f=>requestIdleCallback(f,{timeout:400})):(f=>setTimeout(f,32));
 function opts(){return{C:S.C,honor:S.honor,name:S.name,fs:S.fs/100}}
 function renderAll(){DESIGNS.forEach(d=>{dirty[d.id]=1});pump()}
 function nextDirty(){let best=-1,bd=1e9;list.forEach((d,i)=>{if(dirty[d.id]&&canvases[d.id]){const dd=Math.abs(i-S.index);if(dd<bd){bd=dd;best=i}}});return best<0?null:{i:best,near:bd<=1}}
-function pump(){if(pumping)return;const n=nextDirty();if(!n)return;pumping=true;(n.near?requestAnimationFrame:idle)(tick)}
+function pump(){if(pumping||!canPaint)return;const n=nextDirty();if(!n)return;pumping=true;(n.near?requestAnimationFrame:idle)(tick)}
 function tick(){pumping=false;const n=nextDirty();if(!n)return;
   if(!n.near&&document.hidden){return}
   const d=list[n.i];delete dirty[d.id];try{paint(canvases[d.id],d,opts())}catch(e){}
@@ -573,11 +573,10 @@ async function init(){
   await loadBase();applyContent();
   $('fs').value=S.fs;$('fsVal').textContent=S.fs+'%';$('cw').value=S.cw;$('ch').value=S.ch;
   const y=$('year');if(y)y.textContent=new Date().getFullYear();
-  buildEditor();applyLang();
-  /* لحد ما الخطوط تحمل نستنى بحد أقصى 2.5 ثانية عشان الكروت متترسمش بخط غلط */
-  await Promise.race([fontsP,new Promise(r=>setTimeout(r,2500))]);
-  buildSlider();
-  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>renderAll());
+  buildEditor();applyLang();buildSlider();
+  /* الرسم بيستنى الخطوط بحد أقصى 2.5 ثانية عشان الكروت متترسمش بخط غلط */
+  Promise.race([fontsP,new Promise(r=>setTimeout(r,2500))]).then(()=>{canPaint=true;renderAll();
+    if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>renderAll())});
 
   $('langBtn').addEventListener('click',()=>{S.lang=S.lang==='ar'?'en':'ar';store.set('lang',S.lang);applyLang();requestAnimationFrame(()=>{padTrack();go(S.index,false)})});
   $('filters').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.dataset.filter===S.filter)return;S.filter=b.dataset.filter;S.index=0;invalidateShare();

@@ -41,9 +41,12 @@
 <meta name="apple-mobile-web-app-title" content="دعوة VIP">
 
 <link rel="preload" href="assets/fonts/Alexandria-400-arabic.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="assets/fonts/ArefRuqaa-700-arabic.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/css/fonts.css">
 <link rel="stylesheet" href="assets/css/styles.css">
+<script>/* نسبة المقاس قبل أول رسم عشان مساحة السلايدر تبقى محجوزة (من غير layout shift) */
+try{var z=JSON.parse(localStorage.getItem('vipcards:size')||'"feed"'),R={feed:.8,story:.5625,square:1,screen:1.7778,a5:.7048};var a=R[z];
+if(z==='custom'){var w=+JSON.parse(localStorage.getItem('vipcards:cw')||'1200'),h=+JSON.parse(localStorage.getItem('vipcards:ch')||'1600');if(w>0&&h>0)a=w/h}
+if(a)document.documentElement.style.setProperty('--ar',a.toFixed(4))}catch(e){}</script>
 
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"WebApplication","name":"كروت دعوة VIP","alternateName":"VIP Invitation Cards","url":"https://eslam-invitation-card-vip-designs.vercel.app/","description":"صمّم كارت دعوة VIP فاخر في ثواني: 16 تصميم ذهبي، اكتب اسم المدعو، عدّل النصوص ولينك اللوكيشن، وشارك الكارت على واتساب وكل التطبيقات.","applicationCategory":"DesignApplication","operatingSystem":"Any","inLanguage":["ar","en"],"image":"https://eslam-invitation-card-vip-designs.vercel.app/assets/img/og-image.jpg","offers":{"@type":"Offer","price":"0","priceCurrency":"EGP"},"author":{"@type":"Person","name":"Eslam Afify Barakat","jobTitle":"Software Engineer, Web Developer","url":"https://github.com/eslamafifybarakat"}}
@@ -58,7 +61,7 @@
       <p data-i18n="subtitle">اختار التصميم، اكتب اسم المدعو، وشاركه في ثانية</p>
     </div>
   </div>
-  <button type="button" class="lang" id="langBtn" aria-label="Switch language">EN</button>
+  <button type="button" class="lang" id="langBtn" aria-label="EN — English" lang="en">EN</button>
 </header>
 
 <main class="layout">
