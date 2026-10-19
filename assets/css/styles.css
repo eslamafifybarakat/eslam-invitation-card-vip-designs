@@ -38,10 +38,14 @@ button{cursor:pointer}
 @media (min-width:960px){.layout{grid-template-columns:minmax(0,1.35fr) minmax(320px,.9fr);align-items:start;padding-top:22px}
 }
 
-.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 10px;scrollbar-width:none}
-.chips::-webkit-scrollbar{display:none}
-.chips button{flex:none;height:38px;padding:0 16px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-size:.86rem;font-weight:500;color:var(--muted)}
-.chips button[aria-checked="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.pos-bar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px 12px;padding:2px 2px 12px}
+.pos-label{font-size:.82rem;font-weight:500;color:var(--muted)}
+.pos-seg{display:flex;gap:4px;padding:4px;border-radius:14px;background:#ebe5d8;flex:1 1 260px;max-width:380px}
+.pos-seg button{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:8px;height:42px;padding:0 12px;border:0;border-radius:10px;background:transparent;font-size:.88rem;font-weight:600;color:var(--muted);transition:background .2s,color .2s,box-shadow .2s}
+.pos-seg svg{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.pos-seg button[aria-checked="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 4px rgba(40,30,10,.14)}
+.pos-seg button[aria-checked="true"] svg{stroke:var(--gold)}
+@media (max-width:420px){.pos-label{display:none}.pos-seg{max-width:none}}
 
 .slider{position:relative}
 .track{min-height:calc(min(80vw / var(--ar,.8), 62vh, 760px, 900px / var(--ar,.8)) + 22px);min-height:calc(min(80vw / var(--ar,.8), 62svh, 760px, 900px / var(--ar,.8)) + 22px);display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;padding:8px 10vw 14px;scrollbar-width:none;overscroll-behavior-x:contain}
@@ -212,7 +216,7 @@ html.locked,html.locked body{overflow:hidden}
 }
 @media (prefers-reduced-motion:reduce){.sheet-panel,.sheet-backdrop{transition:none}.btn.pulse{animation:none}}
 @media (max-width:380px){.layout{padding-left:10px;padding-right:10px}.card{padding:14px}.acc{padding:0}}
-@media print{.topbar,.actionbar,.panel,.editor,.footer,.nav,.chips,.thumbs{display:none!important}}
+@media print{.topbar,.actionbar,.panel,.editor,.footer,.nav,.pos-bar,.thumbs{display:none!important}}
 
 /* ---------- combobox ---------- */
 .combo{position:relative}

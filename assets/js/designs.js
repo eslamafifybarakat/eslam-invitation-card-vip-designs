@@ -171,8 +171,8 @@
 
   /* ---------- layout ---------- */
   // [key, base height, scales with font?]
-  function blocks(d,C,general){
-    const top=d.pos==='top';const b=[];
+  function blocks(d,C,general,pos){
+    const top=pos==='top';const b=[];
     b.push(['title',d.laurel?200:160,true]);
     if(top){if(!general)b.push(['honor',42,true],['name',80,true]);b.push(['div',46,false]);if(C.greeting)b.push(['greet',44,true])}
     if(C.bodyLine1)b.push(['body1',48,true]);if(C.bodyLine2)b.push(['body2',48,true]);
@@ -184,8 +184,8 @@
     if(!top&&!general)b.push(['plaque',236,false]);
     return b;
   }
-  function layout(d,C,fs,general){
-    const list=blocks(d,C,general);
+  function layout(d,C,fs,general,namePos){
+    const list=blocks(d,C,general,namePos);
     const heights=list.map(([,h,t])=>h*(t?fs:1));
     const Hc=heights.reduce((a,b)=>a+b,0);
     const padT=70,padB=d.bg[0]==='split'?96:80, Ha=H-padT-padB;
@@ -201,7 +201,7 @@
   /* ---------- main render (ctx already scaled to logical units) ---------- */
   function render(ctx,d,o){
     W=o.LW;H=o.LH;const C=o.C,fs=o.fs||1,L=d.light;
-    const lay=layout(d,C,fs,o.general),s=lay.s;
+    const pos=o.pos||d.pos,lay=layout(d,C,fs,o.general,pos),s=lay.s;
     ctx.clearRect(0,0,W,H);drawBg(ctx,d,lay);d.ov.forEach(v=>overlay(ctx,d,v));drawFrame(ctx,d);
     const glow=L?['rgba(255,255,255,.7)',0,1.5]:['rgba(0,0,0,.45)',10,2];
     const goldW=foil(ctx,-500,-200,500,200,d.foil);
@@ -217,7 +217,7 @@
         else txt(ctx,T('title'),0,-6,g,700,132*fs,F_TITLE,820,'center',glow);break}
       case 'honor':txt(ctx,(o.honor||'')+' /',0,0,d.muted,300,30*fs,F_BODY,760);break;
       case 'name':if(o.name)txt(ctx,o.name,0,0,nameFill(),700,58*fs,F_BODY,780,'center',L?null:glow);else dots(ctx,20,260,d.muted);break;
-      case 'div':divider(ctx,p===lay.pos.find(q=>q.k==='div')&&d.pos==='top'?240:520,goldW);break;
+      case 'div':divider(ctx,p===lay.pos.find(q=>q.k==='div')&&pos==='top'?240:520,goldW);break;
       case 'greet':txt(ctx,T('greeting'),0,0,d.muted,300,26*fs,F_BODY,780);break;
       case 'body1':txt(ctx,T('bodyLine1'),0,0,d.text,400,34*fs,F_BODY,800);break;
       case 'body2':txt(ctx,T('bodyLine2'),0,0,d.text,400,34*fs,F_BODY,800);break;
@@ -250,7 +250,8 @@
       ctx.restore();
     });
     const ss=Math.max(0.7,Math.min(1.1,s));
-    if(d.seal==='red')seal(ctx,150,H-150,64*ss,'red',C.sealLetter);
+    /* لما الاسم تحت، الختم الأحمر بيطلع فوق عشان ميغطيش خانة الاسم */
+    if(d.seal==='red'){if(pos==='bottom'&&!o.general)seal(ctx,150,170,64*ss,'red',C.sealLetter);else seal(ctx,150,H-150,64*ss,'red',C.sealLetter)}
     if(d.seal==='gold')seal(ctx,165,175,62*ss,'gold',C.sealLetter);
   }
 

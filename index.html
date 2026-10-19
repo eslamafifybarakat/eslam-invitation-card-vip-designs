@@ -66,10 +66,12 @@ if(a)document.documentElement.style.setProperty('--ar',a.toFixed(4))}catch(e){}<
 <main class="layout">
   <section class="stage" aria-labelledby="stageTitle">
     <h2 id="stageTitle" class="sr-only" data-i18n="designs">التصميمات</h2>
-    <div class="chips" role="radiogroup" id="filters">
-      <button type="button" role="radio" data-filter="all" aria-checked="true" data-i18n="filterAll">الكل</button>
-      <button type="button" role="radio" data-filter="top" aria-checked="false" data-i18n="filterTop">الاسم فوق</button>
-      <button type="button" role="radio" data-filter="bottom" aria-checked="false" data-i18n="filterBottom">الاسم تحت</button>
+    <div class="pos-bar">
+      <span class="pos-label" id="posLabel" data-i18n="posLabel">مكان الاسم في كل التصميمات</span>
+      <div class="pos-seg" role="radiogroup" id="posSeg" aria-labelledby="posLabel">
+        <button type="button" role="radio" data-pos="top" aria-checked="true"><svg viewBox="0 0 24 24" aria-hidden="true"><rect width="16" height="20" x="4" y="2" rx="2.5"/><path d="M8 7h8" stroke-width="3"/></svg><span data-i18n="posTop">الاسم فوق</span></button>
+        <button type="button" role="radio" data-pos="bottom" aria-checked="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect width="16" height="20" x="4" y="2" rx="2.5"/><path d="M8 17h8" stroke-width="3"/></svg><span data-i18n="posBottom">الاسم تحت</span></button>
+      </div>
     </div>
     <div class="slider">
       <div class="track" id="track" tabindex="0" aria-roledescription="carousel" aria-label="التصميمات"></div>

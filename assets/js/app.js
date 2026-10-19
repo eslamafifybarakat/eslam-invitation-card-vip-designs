@@ -37,7 +37,7 @@ const SIZES=[
 
 const I18N={
  ar:{docTitle:'كروت دعوة VIP — صمّم كارت دعوة فاخر وشاركه على واتساب في ثواني',appTitle:'كروت دعوة VIP',subtitle:'اختار التصميم، اكتب اسم المدعو، وشاركه في ثانية',designs:'التصميمات',
-  filterAll:'الكل',filterTop:'الاسم فوق',filterBottom:'الاسم تحت',prev:'السابق',next:'التالي',
+  posLabel:'مكان الاسم في كل التصميمات',posTop:'الاسم فوق',posBottom:'الاسم تحت',prev:'السابق',next:'التالي',
   guestSection:'بيانات المدعو',honorLabel:'اللقب',honorPh:'اختار أو اكتب اللقب',showTitles:'عرض الألقاب',honorHint:'اكتب أول حروف اللقب عشان تفلتر القائمة، أو اكتب لقب جديد.',
   comboEmpty:'مفيش لقب بالاسم ده — «{v}» هيتكتب زي ما هو',
   generalLabel:'دعوة عامة للكل',generalHint:'إخفاء اللقب واسم المدعو من الكارت عشان تبعته لأي حد.',generalNote:'الكارت جاهز كدعوة عامة — من غير لقب أو اسم.',generalFile:'عامة',actionsLabel:'مشاركة وتنزيل',
@@ -65,7 +65,7 @@ const I18N={
   invitedHonor:'إلى {h} / {n}',mapLine:'📍 اللوكيشن:',
   about:'كروت دعوة VIP: 16 تصميم ذهبي فاخر لدعوات حفلات التخرج والمناسبات. اختار اللقب واكتب اسم المدعو، عدّل النصوص ولينك اللوكيشن (الباركود بيتعمل تلقائيًا)، ونزّل الكارت بمقاس واتساب أو ستوري أو طباعة A5، وشاركه على كل التطبيقات.'},
  en:{docTitle:'VIP Invitation Cards — Design a luxury invitation and share it on WhatsApp',appTitle:'VIP Invitation Cards',subtitle:'Pick a design, add the guest name, share in seconds',designs:'Designs',
-  filterAll:'All',filterTop:'Name on top',filterBottom:'Name at bottom',prev:'Previous',next:'Next',
+  posLabel:'Name position for all designs',posTop:'Name on top',posBottom:'Name at bottom',prev:'Previous',next:'Next',
   guestSection:'Guest details',honorLabel:'Title',honorPh:'Pick or type a title',showTitles:'Show titles',honorHint:'Type the first letters to filter the list, or write a new title.',
   comboEmpty:'No matching title — “{v}” will be used as typed',
   generalLabel:'General invitation for everyone',generalHint:'Hide the title and guest name so the card can be sent to anyone.',generalNote:'The card is ready as a general invitation — no title or name.',generalFile:'عامة',actionsLabel:'Share & download',
@@ -98,7 +98,7 @@ const I18N={
 const store={get(k,d){try{const v=localStorage.getItem('vipcards:'+k);return v===null?d:JSON.parse(v)}catch(_){return d}},
   set(k,v){try{localStorage.setItem('vipcards:'+k,JSON.stringify(v))}catch(_){}},del(k){try{localStorage.removeItem('vipcards:'+k)}catch(_){}}};
 const S={
-  lang:store.get('lang','ar'),filter:'all',index:0,
+  lang:store.get('lang','ar'),pos:store.get('pos','top')==='bottom'?'bottom':'top',index:0,
   size:store.get('size','feed'),cw:store.get('cw',1200),ch:store.get('ch',1600),
   q:store.get('q',2),fmt:store.get('fmt','jpg'),fs:store.get('fs',100),
   honor:'',honorTouched:false,name:'',general:store.get('general',false),
@@ -305,7 +305,7 @@ function resizeCanvases(force){
 /* الكانفاس بيبدأ صغير بنفس النسبة (ذاكرة أقل بكتير) وبياخد حجمه الحقيقي لحظة الرسم بس */
 function placeholder(c){const k=Math.max(pvW,pvH)/64;c.width=Math.max(1,Math.round(pvW/k));c.height=Math.max(1,Math.round(pvH/k))}
 function buildSlider(){
-  list=DESIGNS.filter(d=>S.filter==='all'||d.pos===S.filter);
+  list=DESIGNS.slice();
   const track=$('track');track.innerHTML='';slides=[];
   setAR();const p=previewDims();pvW=p.w;pvH=p.h;
   const frag=document.createDocumentFragment();
@@ -349,7 +349,8 @@ function onScroll(){cancelAnimationFrame(scrollRaf);scrollRaf=requestAnimationFr
 const dirty={};let pumping=false,canPaint=false;
 const idle=window.requestIdleCallback?(f=>requestIdleCallback(f,{timeout:400})):(f=>setTimeout(f,32));
 function guest(){return S.general?'':S.name}
-function opts(){return{C:S.C,honor:S.honor,name:guest(),general:S.general,fs:S.fs/100}}
+function opts(){return{C:S.C,honor:S.honor,name:guest(),general:S.general,pos:S.pos,fs:S.fs/100}}
+function applyPos(){document.querySelectorAll('#posSeg button').forEach(b=>b.setAttribute('aria-checked',String(b.dataset.pos===S.pos)))}
 function applyGeneral(){
   $('generalToggle').checked=S.general;$('guestCard').classList.toggle('is-general',S.general);
   $('guestFields').hidden=S.general;$('generalNote').hidden=!S.general;
@@ -603,14 +604,16 @@ async function init(){
   await loadBase();applyContent();
   $('fs').value=S.fs;$('fsVal').textContent=S.fs+'%';$('cw').value=S.cw;$('ch').value=S.ch;
   const y=$('year');if(y)y.textContent=new Date().getFullYear();
-  buildEditor();applyLang();applyGeneral();buildSlider();
+  buildEditor();applyLang();applyGeneral();applyPos();buildSlider();
   /* الرسم بيستنى الخطوط بحد أقصى 2.5 ثانية عشان الكروت متترسمش بخط غلط */
   Promise.race([fontsP,new Promise(r=>setTimeout(r,2500))]).then(()=>{canPaint=true;renderAll();
     if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>renderAll())});
 
   $('langBtn').addEventListener('click',()=>{S.lang=S.lang==='ar'?'en':'ar';store.set('lang',S.lang);applyLang();requestAnimationFrame(()=>{padTrack();go(S.index,false)})});
-  $('filters').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.dataset.filter===S.filter)return;S.filter=b.dataset.filter;S.index=0;invalidateShare();
-    document.querySelectorAll('#filters button').forEach(x=>x.setAttribute('aria-checked',String(x===b)));buildSlider()});
+  $('posSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.dataset.pos===S.pos)return;
+    S.pos=b.dataset.pos;store.set('pos',S.pos);applyPos();invalidateShare();renderAll()});
+  $('posSeg').addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].indexOf(e.key)<0)return;e.preventDefault();
+    const b=$('posSeg').querySelector('[data-pos="'+(S.pos==='top'?'bottom':'top')+'"]');b.click();b.focus()});
   $('track').addEventListener('scroll',onScroll,{passive:true});
   $('track').addEventListener('keydown',e=>{const rtl=document.documentElement.dir==='rtl';
     if(e.key==='ArrowRight'){e.preventDefault();go(S.index+(rtl?-1:1))}if(e.key==='ArrowLeft'){e.preventDefault();go(S.index+(rtl?1:-1))}});
