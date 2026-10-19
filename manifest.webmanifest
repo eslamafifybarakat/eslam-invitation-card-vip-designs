@@ -1,0 +1,17 @@
+{
+  "name": "كروت دعوة VIP",
+  "short_name": "دعوة VIP",
+  "description": "صمّم كارت دعوة VIP فاخر، اكتب اسم المدعو، وشاركه على واتساب وكل التطبيقات.",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f6f4ef",
+  "theme_color": "#f6f4ef",
+  "icons": [
+    { "src": "/assets/img/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/img/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/img/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
