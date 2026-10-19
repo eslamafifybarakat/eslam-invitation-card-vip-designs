@@ -3,7 +3,7 @@
 'use strict';
 importScripts('vendor/qrcode.min.js', 'designs.js');
 
-const {DESIGNS, paint, warmSteps} = self.VIPCards;
+const {DESIGNS, paint} = self.VIPCards;
 const byId = {};
 DESIGNS.forEach(d => { byId[d.id] = d; });
 const canvases = {};
@@ -21,7 +21,6 @@ self.onmessage = async (e) => {
         }));
         faces.forEach(f => self.fonts.add(f));
         await Promise.all(faces.map(f => f.load()));
-        warmSteps(m.C).forEach(step => { try { step(); } catch (_) {} });
         postMessage({type: 'ready'});
         break;
       }

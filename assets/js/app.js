@@ -396,7 +396,7 @@ function startWorker(){return new Promise(res=>{
       if(m.stage==='init'&&!wReady)fail();
       else if(m.req&&wReqs[m.req]){wReqs[m.req].rej(new Error(m.message));delete wReqs[m.req]}
       else if(m.stage==='paint'){wBusy=false;pump()}}};
-  w.postMessage({type:'init',fonts:fontDescriptors(),C:S.C});
+  w.postMessage({type:'init',fonts:fontDescriptors()});
 })}
 function transferCanvas(c){if(c.__off)return;const off=c.transferControlToOffscreen();c.__off=true;
   const z=csz[c.__id]||{w:pvW,h:pvH};off.width=z.w;off.height=z.h;W.postMessage({type:'canvas',id:c.__id,canvas:off},[off])}
@@ -641,13 +641,15 @@ function toast(m){const e=$('toast');e.textContent=m;e.classList.add('show');cle
 
 /* ---------- wire up ---------- */
 async function init(){
+  /* الـ worker بيبدأ فورًا بالتوازي مع تحميل النصوص */
+  const workerP=startWorker();
   await loadBase();applyContent();
   $('fs').value=S.fs;$('fsVal').textContent=S.fs+'%';$('cw').value=S.cw;$('ch').value=S.ch;
   const y=$('year');if(y)y.textContent=new Date().getFullYear();
   applyLang();applyGeneral();applyPos();buildSlider();
   /* محرر النصوص تحت الصفحة، فبيتبني في مهمة لوحده بعد أول رسم */
   setTimeout(()=>{buildEditor();buildEditorLabels();textsStatus()},0);
-  startWorker().then(ok=>{
+  workerP.then(ok=>{
     if(ok){Object.keys(canvases).forEach(id=>transferCanvas(canvases[id]));canPaint=true;renderAll();return}
     /* من غير worker: الرسم بيستنى الخطوط بحد أقصى 2.5 ثانية عشان الكروت متترسمش بخط غلط */
     const fontsP=(document.fonts&&document.fonts.load)?Promise.all(['300','400','600','700'].map(w=>document.fonts.load(w+' 30px "Alexandria"','دعوة سيادة 2026'))

@@ -31,12 +31,16 @@ html = html
   .replace(/<link rel="stylesheet" href="assets\/css\/fonts\.css">\s*/, '')
   .replace(/<link rel="stylesheet" href="assets\/css\/styles\.css">/, `<style>${minCss(css)}</style>`);
 
-// fingerprint scripts; the worker's importScripts and app.js's worker URL are
-// versioned too, so the year-long immutable cache never serves a stale file
-const v = (f) => hash(readFileSync(f));
-let worker = readFileSync('assets/js/paint-worker.js', 'utf8')
-  .replace("'vendor/qrcode.min.js'", `'vendor/qrcode.min.js?v=${v('assets/js/vendor/qrcode.min.js')}'`)
-  .replace("'designs.js'", `'designs.js?v=${v('assets/js/designs.js')}'`);
+// fingerprint scripts; app.js points at the versioned worker bundle, so the
+// year-long immutable cache never serves a stale file
+// the worker ships as one bundle (QR lib + designs + worker) so it starts without extra requests
+const workerSrc = readFileSync('assets/js/paint-worker.js', 'utf8');
+if (!/importScripts\('vendor\/qrcode\.min\.js', 'designs\.js'\);/.test(workerSrc)) throw new Error('worker importScripts line changed');
+let worker = [
+  readFileSync('assets/js/vendor/qrcode.min.js', 'utf8'),
+  readFileSync('assets/js/designs.js', 'utf8'),
+  workerSrc.replace(/importScripts\('vendor\/qrcode\.min\.js', 'designs\.js'\);/, ''),
+].join(';\n');
 writeFileSync(`${OUT}/assets/js/paint-worker.js`, worker);
 let app = readFileSync('assets/js/app.js', 'utf8')
   .replace("'assets/js/paint-worker.js'", `'assets/js/paint-worker.js?v=${hash(worker)}'`);
