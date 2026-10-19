@@ -398,6 +398,12 @@ function startWorker(){return new Promise(res=>{
       else if(m.stage==='paint'){wBusy=false;pump()}}};
   w.postMessage({type:'init',fonts:fontDescriptors()});
 })}
+/* الـ worker بيجهز كارت الشاشة لنفسه، فبنستنى الصفحة ترسم أول مرة الأول عشان الشاشة متفضلش بيضا */
+function afterFirstPaint(){return new Promise(res=>{let done=false;const go=()=>{if(!done){done=true;res()}};
+  try{if(performance.getEntriesByName('first-contentful-paint').length)return go();
+    const po=new PerformanceObserver(l=>{if(l.getEntries().some(e=>e.name==='first-contentful-paint')){po.disconnect();go()}});
+    po.observe({type:'paint',buffered:true})}catch(_){}
+  setTimeout(go,1500)})}
 function transferCanvas(c){if(c.__off)return;const off=c.transferControlToOffscreen();c.__off=true;
   const z=csz[c.__id]||{w:pvW,h:pvH};off.width=z.w;off.height=z.h;W.postMessage({type:'canvas',id:c.__id,canvas:off},[off])}
 let timer;function schedule(){clearTimeout(timer);invalidateShare();timer=setTimeout(renderAll,120)}
@@ -641,8 +647,8 @@ function toast(m){const e=$('toast');e.textContent=m;e.classList.add('show');cle
 
 /* ---------- wire up ---------- */
 async function init(){
-  /* الـ worker بيبدأ فورًا بالتوازي مع تحميل النصوص */
-  const workerP=startWorker();
+  /* الـ worker بيبدأ بعد أول رسم للصفحة، بالتوازي مع تحميل النصوص */
+  const workerP=afterFirstPaint().then(startWorker);
   await loadBase();applyContent();
   $('fs').value=S.fs;$('fsVal').textContent=S.fs+'%';$('cw').value=S.cw;$('ch').value=S.ch;
   const y=$('year');if(y)y.textContent=new Date().getFullYear();
